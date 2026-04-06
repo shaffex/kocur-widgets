@@ -14,12 +14,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+
+        let category = UNNotificationCategory(
+            identifier: "CARPLAY_CATEGORY",
+            actions: [],
+            intentIdentifiers: [],
+            options: [.allowInCarPlay]
+        )
+        center.setNotificationCategories([category])
+
+        center.requestAuthorization(options: [.alert, .sound, .badge, .carPlay]) { granted, _ in
             guard granted else { return }
             DispatchQueue.main.async {
                 UIApplication.shared.registerForRemoteNotifications()
             }
         }
+
         return true
     }
 
