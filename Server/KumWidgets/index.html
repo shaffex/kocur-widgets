@@ -32,9 +32,33 @@
         .btn-save { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; background: #a6e3a1; color: #1e1e2e; transition: all 0.2s; }
         .btn-save:hover { background: #94e2d5; }
         .btn-save:active { transform: scale(0.97); }
+        .btn-vars { padding: 8px 14px; border: 1px solid #45475a; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; background: #313244; color: #cba6f7; transition: all 0.2s; }
+        .btn-vars:hover { background: #45475a; }
         .status { font-size: 13px; color: #a6adc8; padding: 0 8px; display: flex; align-items: center; }
         .status.saved { color: #a6e3a1; }
         .status.error { color: #f38ba8; }
+
+        /* ── Variables panel ── */
+        .vars-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200; }
+        .vars-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+        .vars-panel { background: #1e1e2e; border-radius: 16px 16px 0 0; width: 100%; max-width: 680px; padding: 24px 24px 32px; max-height: 80vh; display: flex; flex-direction: column; border-top: 1px solid #313244; }
+        .vars-panel h3 { color: #cdd6f4; font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: baseline; gap: 8px; }
+        .vars-panel h3 em { font-size: 11px; color: #6c7086; font-style: normal; font-weight: 400; }
+        .vars-list { flex: 1; overflow-y: auto; }
+        .var-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .var-key-badge { font-family: 'SF Mono', monospace; font-size: 12px; color: #cba6f7; background: #313244; padding: 7px 10px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .var-val-field { background: #313244; border: 1px solid #45475a; border-radius: 6px; padding: 7px 10px; color: #cdd6f4; font-size: 13px; font-family: inherit; outline: none; width: 100%; }
+        .var-val-field:focus { border-color: #cba6f7; }
+        .var-del { background: none; border: 1px solid #45475a; border-radius: 6px; color: #6c7086; cursor: pointer; padding: 7px 10px; font-size: 13px; line-height: 1; transition: all .15s; }
+        .var-del:hover { border-color: #f38ba8; color: #f38ba8; }
+        .vars-empty { color: #6c7086; font-size: 13px; padding: 12px 0; }
+        .vars-add-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #313244; }
+        .vars-add-row input { background: #313244; border: 1px solid #45475a; border-radius: 6px; padding: 8px 10px; color: #cdd6f4; font-size: 13px; font-family: inherit; outline: none; }
+        .vars-add-row input:focus { border-color: #cba6f7; }
+        .var-key-input { font-family: 'SF Mono', monospace; text-transform: uppercase; }
+        .btn-add-var { background: #cba6f7; color: #1e1e2e; border: none; border-radius: 6px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .btn-add-var:hover { background: #b4befe; }
+        .vars-hint { font-size: 11px; color: #6c7086; margin-top: 10px; line-height: 1.6; }
         main { flex: 1; display: flex; overflow: hidden; }
         .editor-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .pane-header { padding: 8px 16px; background: #181825; font-size: 12px; color: #6c7086; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #313244; }
@@ -234,9 +258,24 @@
         </div>
         <div class="actions">
             <span class="status" id="status"></span>
+            <button class="btn-vars" id="varsBtn">⚙ Variables</button>
             <button class="btn-save" id="saveBtn">Save</button>
         </div>
     </header>
+
+    <!-- Variables panel -->
+    <div class="vars-overlay" id="varsOverlay">
+        <div class="vars-panel">
+            <h3>⚙ Variables <em>— use {{KEY}} in widget XML · showing for <span id="varsUserLabel"></span></em></h3>
+            <div class="vars-list" id="varsList"></div>
+            <div class="vars-add-row">
+                <input class="var-key-input" id="newVarKey" type="text" placeholder="KEY" maxlength="32" autocomplete="off" spellcheck="false">
+                <input id="newVarVal" type="text" placeholder="value" autocomplete="off">
+                <button class="btn-add-var" id="addVarBtn">Add</button>
+            </div>
+            <p class="vars-hint">Write <code style="color:#cba6f7">{{KEY}}</code> anywhere in widget XML — replaced with the stored value when served. iOS app can also push updates via <code style="color:#a6e3a1">updateVariablesToServer</code>.</p>
+        </div>
+    </div>
     <main>
         <div class="editor-pane">
             <div class="pane-header">XML Widget — <span id="currentLabel">petres / systemSmall</span></div>
@@ -618,6 +657,92 @@
 
         // Save button
         saveBtn.addEventListener('click', saveContent);
+
+        // ── Variables panel ───────────────────────────────────────────────────
+        const varsOverlay = document.getElementById('varsOverlay');
+        const varsList    = document.getElementById('varsList');
+
+        async function loadVars() {
+            document.getElementById('varsUserLabel').textContent = currentUser;
+            varsList.innerHTML = '<span class="vars-empty">Loading…</span>';
+            try {
+                const res  = await fetch('api.php?action=get_variables&user=' + currentUser);
+                const data = await res.json();
+                renderVars(data.variables || {});
+            } catch {
+                varsList.innerHTML = '<span class="vars-empty">Failed to load.</span>';
+            }
+        }
+
+        function renderVars(vars) {
+            varsList.innerHTML = '';
+            const keys = Object.keys(vars).sort();
+            if (keys.length === 0) {
+                varsList.innerHTML = '<span class="vars-empty">No variables yet. Add one below or push from iOS.</span>';
+                return;
+            }
+            keys.forEach(key => {
+                const row = document.createElement('div');
+                row.className = 'var-row';
+                row.innerHTML = `
+                    <div class="var-key-badge">{{${key}}}</div>
+                    <input class="var-val-field" data-key="${key}" value="${vars[key].replace(/"/g, '&quot;')}">
+                    <button class="var-del" data-key="${key}" title="Delete">✕</button>`;
+                varsList.appendChild(row);
+            });
+
+            varsList.querySelectorAll('.var-val-field').forEach(input => {
+                let timer;
+                input.addEventListener('input', () => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => saveVar(input.dataset.key, input.value), 600);
+                });
+            });
+
+            varsList.querySelectorAll('.var-del').forEach(btn => {
+                btn.addEventListener('click', () => deleteVar(btn.dataset.key));
+            });
+        }
+
+        async function saveVar(key, value) {
+            await fetch('api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'set_variable', user: currentUser, key, value })
+            });
+        }
+
+        async function deleteVar(key) {
+            await fetch('api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete_variable', user: currentUser, key })
+            });
+            await loadVars();
+        }
+
+        document.getElementById('varsBtn').addEventListener('click', () => {
+            varsOverlay.classList.add('open');
+            loadVars();
+        });
+
+        varsOverlay.addEventListener('click', e => {
+            if (e.target === varsOverlay) varsOverlay.classList.remove('open');
+        });
+
+        document.getElementById('addVarBtn').addEventListener('click', async () => {
+            const key = document.getElementById('newVarKey').value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+            const val = document.getElementById('newVarVal').value;
+            if (!key) { document.getElementById('newVarKey').focus(); return; }
+            await saveVar(key, val);
+            document.getElementById('newVarKey').value = '';
+            document.getElementById('newVarVal').value = '';
+            await loadVars();
+        });
+
+        document.getElementById('newVarVal').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('addVarBtn').click();
+        });
 
         // Initial load
         refreshTemplateBar();

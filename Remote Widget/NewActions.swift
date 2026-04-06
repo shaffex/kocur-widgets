@@ -11,6 +11,14 @@ import WidgetKit
 import AppIntents
 import ActivityKit
 
+struct SxAction_updateVariablesToServer: SxActionProtocol {
+    let node: MagicNode?
+    
+    func execute(_ actionString: String) {
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+}
+
 struct SxAction_reloadAllTimelines: SxActionProtocol {
     let node: MagicNode?
     

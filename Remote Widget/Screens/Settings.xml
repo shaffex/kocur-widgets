@@ -3,15 +3,19 @@
     <form navigationTitle="Settings">
         <section>
             <navigationlink destination="webSendPush">Send Push</navigationlink>
+            <navigationlink destination="webVariables">Set Variables</navigationlink>
         </section>
         
+<!--        <button action="updateVariablesToServer">Update status</button>-->
+        
         <section footer="Access only for Kumove">
-            <text badge="1.0 beta">Version</text>
+            <text badge="$SYSTEM_BUNDLE.VERSION ($SYSTEM_BUNDLE.BUILD)">Version</text>
 
         </section>
 
     </form>
     
     <webview id="webSendPush">url:https://magic-ui.com/KumWidgets/PushNotifications/index.php?simpleMode=1</webview>
+    <webview id="webVariables">url:https://magic-ui.com/KumWidgets/variables.php</webview>
     
 </body>
