@@ -69,20 +69,12 @@
 			);
 			target = 2F14B70D2F7EA6DC00DE5212 /* WidgetExtensionExtension */;
 		};
-		2F529F602F83B1D0008DBC6A /* Exceptions for "Remote Widget" folder in "Remote Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Server/uploadPushToken.php,
-			);
-			target = 2F14B67C2F7EA07A00DE5212 /* Remote Widget */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2F14B67F2F7EA07A00DE5212 /* Remote Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2F529F602F83B1D0008DBC6A /* Exceptions for "Remote Widget" folder in "Remote Widget" target */,
 				2F14B77E2F82D3B100DE5212 /* Exceptions for "Remote Widget" folder in "WidgetExtensionExtension" target */,
 			);
 			path = "Remote Widget";
