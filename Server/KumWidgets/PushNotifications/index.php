@@ -399,16 +399,23 @@ $count = count($tokens);
                 <label>Body *</label>
                 <textarea name="body" placeholder="Notification message…" required></textarea>
             </div>
-            <?php if (!$simpleMode): ?>
             <div class="form-group">
                 <label>Badge</label>
                 <input type="number" name="badge" placeholder="0" min="0">
             </div>
             <div class="form-group">
                 <label>Sound</label>
+                <?php if ($simpleMode): ?>
+                <select name="sound">
+                    <option value="default">default</option>
+                    <option value="meow0.wav">meow0.wav</option>
+                    <option value="meow1.wav">meow1.wav</option>
+                    <option value="meow2.wav">meow2.wav</option>
+                </select>
+                <?php else: ?>
                 <input type="text" name="sound" placeholder="default" value="default">
+                <?php endif; ?>
             </div>
-            <?php endif; ?>
         </div>
 
         <button type="submit" class="send-btn" id="sendBtn">
@@ -474,8 +481,9 @@ function restoreForm() {
 
 restoreForm();
 
-document.getElementById('pushForm').querySelectorAll('input, textarea').forEach(el => {
+document.getElementById('pushForm').querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', saveForm);
+    el.addEventListener('change', saveForm);
 });
 
 document.getElementById('fillBtn').addEventListener('click', () => {
