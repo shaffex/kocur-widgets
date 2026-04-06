@@ -5,10 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KOCUR NEWS</title>
-    <!-- Prevent WKWebView flicker: hide until JS has restored form state -->
-    <style>body { visibility: hidden; }</style>
+    <script>
+    // Runs before body is parsed — restoreForm() defined here so it can be
+    // called inline right after the form, before WKWebView's first paint.
+    const FIELDS = ['title', 'subtitle', 'body', 'badge', 'sound'];
+    const STORE  = 'kocurPushForm';
+    function restoreForm() {
+        const raw = localStorage.getItem(STORE);
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            const form = document.getElementById('pushForm');
+            if (!form) return;
+            FIELDS.forEach(f => { if (data[f] !== undefined && form[f]) form[f].value = data[f]; });
+        } catch {}
+    }
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { background: <?= $simpleMode ? '#fff' : '#f2f2f7' ?>; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -241,7 +257,7 @@
     .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
         /* ── simple mode overrides ── */
-        body.simple { padding: 16px; background: #fff; }
+        body.simple { padding: 16px; background: #fff; overscroll-behavior: none; }
         body.simple h1 { font-size: 20px; margin-bottom: 4px; }
         body.simple .subtitle { margin-bottom: 16px; }
         body.simple .section { border-radius: 0; box-shadow: none; padding: 0; background: none; margin-bottom: 0; }
@@ -263,7 +279,7 @@
         #result.error   { background: #fdecea; color: #c0392b; }
 
         /* ── result panel ── */
-        #resultPanel { display: none; margin-top: 20px; }
+        #resultPanel { visibility: hidden; margin-top: 20px; }
 
         .result-summary {
             display: flex;
@@ -424,6 +440,8 @@ $count = count($tokens);
             Send to All <?= $count ?> Device<?= $count !== 1 ? 's' : '' ?>
         </button>
     </form>
+    <!-- Restore saved values synchronously before WKWebView's first paint — no flicker -->
+    <script>restoreForm();</script>
 
     <pre id="result"></pre>
 
@@ -460,29 +478,13 @@ if (sandboxToggle) {
     });
 }
 
-// ── persist & restore form values ─────────────────────────────────────────
-const FIELDS = ['title', 'subtitle', 'body', 'badge', 'sound'];
-const STORE  = 'kocurPushForm';
-
+// ── persist form values ────────────────────────────────────────────────────
 function saveForm() {
     const form = document.getElementById('pushForm');
     const data = {};
     FIELDS.forEach(f => data[f] = form[f].value);
     localStorage.setItem(STORE, JSON.stringify(data));
 }
-
-function restoreForm() {
-    const raw = localStorage.getItem(STORE);
-    if (!raw) return;
-    try {
-        const data = JSON.parse(raw);
-        const form = document.getElementById('pushForm');
-        FIELDS.forEach(f => { if (data[f] !== undefined) form[f].value = data[f]; });
-    } catch {}
-}
-
-restoreForm();
-document.body.style.visibility = 'visible';
 
 document.getElementById('pushForm').querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', saveForm);
@@ -516,8 +518,8 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
 
     btn.disabled    = true;
     btn.textContent = 'Sending…';
-    document.getElementById('resultPanel').style.display = 'none';
-    document.getElementById('result').style.display      = 'none';
+    document.getElementById('resultPanel').style.visibility = 'hidden';
+    document.getElementById('result').style.display         = 'none';
 
     let sentText   = '—';
     let failedText = '—';
@@ -577,7 +579,7 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
 
         btn.disabled    = false;
         btn.textContent = 'Send to All <?= $count ?> Device<?= $count !== 1 ? 's' : '' ?>';
-        panel.style.display = 'block';
+        panel.style.visibility = 'visible';
     });
 });
 </script>

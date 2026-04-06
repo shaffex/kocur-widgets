@@ -3,22 +3,21 @@
  * sendWidgetUpdate.php — WidgetPushNotifications
  *
  * Sends a silent background push to all registered devices to trigger
- * a widget timeline reload. Uses apns-push-type: background + priority 5.
+ * a widget timeline reload. Uses apns-push-type: widgets + priority 5.
  *
  * Optional POST JSON parameters:
- *   sandbox     – true = sandbox APNs, false = production (default: false)
  *   data        – custom key/value object passed inside the payload
  *                 (e.g. { "xmlUrl": "https://..." } for the widget to read)
  */
 
 // ── APNs config ────────────────────────────────────────────────────────────
-define('APNS_KEY_PATH',        __DIR__ . '/../AuthKey_X5ZFL4832N.p8');
-define('APNS_KEY_ID',          'X5ZFL4832N');
-define('APNS_TEAM_ID',         'X47885HM53');
-define('APNS_TOPIC',           'com.shaffex.remotewidget.push-type.widgets');
-define('APNS_HOST_PROD',       'https://api.push.apple.com');
-define('APNS_HOST_SANDBOX',    'https://api.sandbox.push.apple.com');
-define('REMOVE_DEAD_TOKENS',   true);
+define('APNS_KEY_PATH',      __DIR__ . '/../AuthKey_X5ZFL4832N.p8');
+define('APNS_KEY_ID',        'X5ZFL4832N');
+define('APNS_TEAM_ID',       'X47885HM53');
+define('APNS_TOPIC',         'com.shaffex.remotewidget.push-type.widgets');
+define('APNS_HOST_PROD',     'https://api.push.apple.com');
+define('APNS_HOST_SANDBOX',  'https://api.sandbox.push.apple.com');
+define('REMOVE_DEAD_TOKENS', false);
 
 // ── bootstrap ──────────────────────────────────────────────────────────────
 header('Content-Type: application/json');
@@ -68,7 +67,7 @@ function apnsJWT(): string {
 // ── build widget update payload ────────────────────────────────────────────
 function buildWidgetPayload(array $custom): string {
     return json_encode(array_merge($custom, [
-        'aps' => ['content-changed' => 1],
+        'aps' => ['content-changed' => true],
     ]));
 }
 
@@ -87,6 +86,7 @@ function sendToToken(string $token, string $jwt, string $payload, string $host):
             'apns-topic: '           . APNS_TOPIC,
             'apns-push-type: widgets',
             'apns-priority: 5',
+            'apns-expiration: 0',
             'Content-Type: application/json',
         ],
     ]);
@@ -99,9 +99,9 @@ function sendToToken(string $token, string $jwt, string $payload, string $host):
 }
 
 // ── send to all devices ────────────────────────────────────────────────────
+$ts = date('Y-m-d H:i:s');
 $apnsHost = $sandbox ? APNS_HOST_SANDBOX : APNS_HOST_PROD;
 $env      = $sandbox ? 'SANDBOX' : 'PRODUCTION';
-$ts       = date('Y-m-d H:i:s');
 
 $jwt     = apnsJWT();
 $payload = buildWidgetPayload($custom);
