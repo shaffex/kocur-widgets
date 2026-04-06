@@ -1,0 +1,24 @@
+{
+  "originHash" : "28c3417945e0d96f8dbc38005b3888e063a30939639763850071042bd474e8c5",
+  "pins" : [
+    {
+      "identity" : "magicui-framework-beta",
+      "kind" : "remoteSourceControl",
+      "location" : "https://gitlab.com/peter.popovec/magicui-framework-beta",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7e1084fc4b1fdf6ef08cda76d0728f0b76ad2ede"
+      }
+    },
+    {
+      "identity" : "magicwidget",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shaffex/magicwidget.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "ca575d59a6a2b311e91593fae5e19cafab26376f"
+      }
+    }
+  ],
+  "version" : 3
+}

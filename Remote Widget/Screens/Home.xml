@@ -1,0 +1,11 @@
+<body>
+
+    <vstack navigationTitle="Home">
+    <text font="custom;size:96">🐈‍⬛</text>
+    <button action="reloadAllTimelines">RELOAD WIDGET</button>
+    
+    <button action="startLiveActivity">START LIVE ACTIVITY</button>
+    
+    </vstack>
+    
+</body>

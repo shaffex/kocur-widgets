@@ -1,0 +1,13 @@
+<body>
+    <form navigationTitle="Settings">
+        <text>In progres ...</text>
+        <toggle key="isShowingSearch" value="true">Search Tab</toggle>
+        <toggle key="isShowingFavorites" value="true">Favorites Tab</toggle>
+
+        <section footer="Access only for Kumove">
+            <text badge="1.0 beta">Version</text>
+
+        </section>
+
+    </form>
+</body>

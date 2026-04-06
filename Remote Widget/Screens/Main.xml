@@ -1,0 +1,13 @@
+<body>
+    <tabview key="selectedTab" value="Home">
+        <navigationstack tabItem="label:Home;systemImage:house" tag="Home">
+            <remoteview src="resource:Home"/>
+        </navigationstack>
+
+        <navigationstack tabItem="label:Settings;systemImage:gear" tag="Settings">
+            <remoteview src="resource:Settings"/>
+        </navigationstack>
+    </tabview>
+
+</body>
+
