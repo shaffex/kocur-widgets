@@ -9,34 +9,69 @@ import SwiftUI
 import WidgetKit
 import AppIntents
 import MagicWidget
+import UIKit
+import Darwin
 
 struct MyPushHandler: WidgetPushHandler {
     func pushTokenDidChange(_ pushInfo: WidgetPushInfo, widgets: [WidgetInfo]) {
         Task {
-            await sendLatest(pushInfo, widgets: widgets)
+            await uploadWidgetPushToken(pushInfo, widgets: widgets)
         }
     }
 
-    private func sendLatest(_ pushInfo: WidgetPushInfo, widgets: [WidgetInfo]) async {
-        let hex = pushInfo.token.map { String(format: "%02x", $0) }.joined()
+    private func uploadWidgetPushToken(_ pushInfo: WidgetPushInfo, widgets: [WidgetInfo]) async {
+        let tokenHex = pushInfo.token.map { String(format: "%02x", $0) }.joined()
 
-        guard let url = URL(string: "https://magic-ui.com/KumWidgets/receive_token.php") else { return }
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try? JSONSerialization.data(withJSONObject: [
-            "token": hex,
-            "kinds": widgets.map(\.kind)
-        ])
+        // Deduplicate by kind, extract config if available
+        var seen = Set<String>()
+        let widgetConfigs: [[String: Any]] = widgets.compactMap { widget in
+            guard !seen.contains(widget.kind) else { return nil }
+            seen.insert(widget.kind)
+
+            let intent = widget.configuration as? MyCustomNetworkWidgetIntent
+            return [
+                "kind":            widget.kind,
+                "deviceId":        intent?.deviceId        ?? "(not configured)",
+                "refreshInterval": intent?.refreshInterval ?? -1,
+                "widgetURL":       intent?.widgetURL       ?? "(not configured)",
+                "configured":      intent != nil
+            ]
+        }
+
+        let payload: [String: Any] = [
+            "pushToken":    tokenHex,
+            "deviceUUID":   UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString,
+            "bundleID":     Bundle.main.bundleIdentifier ?? "",
+            "deviceModel":  machineIdentifier(),
+            "osVersion":    UIDevice.current.systemVersion,
+            "appVersion":   Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
+            "widgetConfigs": widgetConfigs
+        ]
+
+        guard let url = URL(string: Config.widgetPushTokenURL),
+              let body = try? JSONSerialization.data(withJSONObject: payload) else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = body
 
         do {
-            let (_, response) = try await URLSession.shared.data(for: req)
+            let (_, response) = try await URLSession.shared.data(for: request)
             if let http = response as? HTTPURLResponse {
-                print("Token upload status:", http.statusCode)
+                print("Widget token upload status:", http.statusCode)
             }
         } catch {
-            print("Token upload failed:", error)
+            print("Widget token upload failed:", error)
         }
+    }
+
+    private func machineIdentifier() -> String {
+        var size = 0
+        sysctlbyname("hw.machine", nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.machine", &machine, &size, nil, 0)
+        return String(cString: machine)
     }
 }
 

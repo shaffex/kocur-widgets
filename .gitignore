@@ -26,3 +26,4 @@ build/
 .env
 .env.local
 *.xcuserstate
+Remote Widget.xcodeproj/xcuserdata/petres.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist

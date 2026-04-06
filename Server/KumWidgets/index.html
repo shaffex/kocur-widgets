@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagicUI Widget Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/hint/show-hint.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/edit/matchtags.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/addon/selection/active-line.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e2e; color: #cdd6f4; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #181825; padding: 12px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #313244; }
+        header h1 { font-size: 18px; font-weight: 600; color: #cba6f7; }
+        .user-switch { display: flex; gap: 4px; background: #313244; border-radius: 8px; padding: 3px; }
+        .user-switch button { padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; background: transparent; color: #a6adc8; transition: all 0.2s; }
+        .user-switch button.active { background: #cba6f7; color: #1e1e2e; }
+        .user-switch button:hover:not(.active) { color: #cdd6f4; }
+        .family-switch { display: flex; gap: 4px; background: #313244; border-radius: 8px; padding: 3px; }
+        .family-switch button { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; background: transparent; color: #a6adc8; transition: all 0.2s; }
+        .family-switch button.active { background: #89b4fa; color: #1e1e2e; }
+        .family-switch button:hover:not(.active) { color: #cdd6f4; }
+        .actions { margin-left: auto; display: flex; gap: 8px; }
+        .btn-save { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; background: #a6e3a1; color: #1e1e2e; transition: all 0.2s; }
+        .btn-save:hover { background: #94e2d5; }
+        .btn-save:active { transform: scale(0.97); }
+        .status { font-size: 13px; color: #a6adc8; padding: 0 8px; display: flex; align-items: center; }
+        .status.saved { color: #a6e3a1; }
+        .status.error { color: #f38ba8; }
+        main { flex: 1; display: flex; overflow: hidden; }
+        .editor-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .pane-header { padding: 8px 16px; background: #181825; font-size: 12px; color: #6c7086; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #313244; }
+        .templates-bar { padding: 8px 16px; background: #181825; border-bottom: 1px solid #313244; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .templates-bar span { font-size: 12px; color: #6c7086; text-transform: uppercase; letter-spacing: 1px; margin-right: 4px; }
+        .tpl-btn { padding: 4px 10px; border: 1px solid #45475a; border-radius: 6px; background: #313244; color: #bac2de; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .tpl-btn:hover { background: #45475a; color: #cdd6f4; border-color: #585b70; }
+        #editor-container { flex: 1; overflow: hidden; }
+
+        /* CodeMirror 5 dark theme */
+        .CodeMirror {
+            height: 100%;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .CodeMirror-gutters { background: #181825; border-right: 1px solid #313244; }
+        .CodeMirror-linenumber { color: #45475a; }
+        .CodeMirror-cursor { border-left-color: #cdd6f4; }
+        .CodeMirror-selected { background: rgba(137, 180, 250, 0.2); }
+        .CodeMirror-activeline-background { background: rgba(69, 71, 90, 0.25); }
+        .CodeMirror-activeline-gutter { background: #1e1e2e; }
+        .CodeMirror-matchingtag { background: rgba(137, 180, 250, 0.15); }
+        .CodeMirror-focused .CodeMirror-selected { background: rgba(137, 180, 250, 0.25); }
+        .cm-s-default .cm-tag { color: #89b4fa; font-weight: 600; }
+        .cm-s-default .cm-attribute { color: #f9e2af; }
+        .cm-s-default .cm-string { color: #a6e3a1; }
+        .cm-s-default .cm-comment { color: #6c7086; font-style: italic; }
+        .cm-s-default .cm-meta { color: #f38ba8; }
+        .cm-s-default .cm-bracket { color: #7f849c; }
+        .cm-s-default .cm-error { color: #f38ba8; }
+
+        /* Autocomplete hints */
+        .CodeMirror-hints {
+            background: #313244 !important;
+            border: 1px solid #45475a !important;
+            border-radius: 8px !important;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            padding: 4px 0;
+            z-index: 100;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .CodeMirror-hint {
+            color: #cdd6f4 !important;
+            padding: 4px 12px !important;
+            border-radius: 4px;
+            margin: 0 4px;
+        }
+        .CodeMirror-hint-active {
+            background: #45475a !important;
+            color: #cdd6f4 !important;
+        }
+        .hint-detail {
+            color: #6c7086;
+            font-style: italic;
+            margin-left: 8px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MagicUI Editor</h1>
+        <div class="user-switch">
+            <button class="active" data-user="petres">Petres</button>
+            <button data-user="lukes">Lukes</button>
+        </div>
+        <div class="family-switch">
+            <button class="active" data-family="systemSmall">Small</button>
+            <button data-family="systemMedium">Medium</button>
+        </div>
+        <div class="actions">
+            <span class="status" id="status"></span>
+            <button class="btn-save" id="saveBtn">Save</button>
+        </div>
+    </header>
+    <main>
+        <div class="editor-pane">
+            <div class="pane-header">XML Widget — <span id="currentLabel">petres / systemSmall</span></div>
+            <div class="templates-bar">
+                <span>Templates:</span>
+                <button class="tpl-btn" data-tpl="clock">Clock</button>
+                <button class="tpl-btn" data-tpl="weather">Weather</button>
+                <button class="tpl-btn" data-tpl="quote">Quote</button>
+                <button class="tpl-btn" data-tpl="countdown">Countdown</button>
+                <button class="tpl-btn" data-tpl="stats">Stats</button>
+                <button class="tpl-btn" data-tpl="profile">Profile Card</button>
+                <button class="tpl-btn" data-tpl="checklist">Checklist</button>
+                <button class="tpl-btn" data-tpl="music">Now Playing</button>
+                <button class="tpl-btn" data-tpl="minimal">Minimal</button>
+            </div>
+            <div id="editor-container"><textarea id="editor-textarea"></textarea></div>
+        </div>
+    </main>
+
+    <script>
+        // -- MagicUI schema for autocomplete --
+        const magicSchema = {
+            '!top': ['body'],
+            body: { children: ['vstack','hstack','zstack','text','image','button','spacer','divider','list','form','section','toggle','textfield','securefield','picker','stepper','navigationstack','tabview','view','label'] },
+            vstack: {
+                attrs: { spacing: null, padding: null, alignment: ['leading','center','trailing'], foregroundColor: null, background: null, font: null, fontSize: null, fontWeight: null, 'if': null, frame: null, cornerRadius: null, opacity: null, id: null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','list','form','section','toggle','textfield','securefield','picker','stepper','navigationstack','tabview','view','label']
+            },
+            hstack: {
+                attrs: { spacing: null, padding: null, alignment: ['leading','center','trailing','top','bottom'], foregroundColor: null, background: null, font: null, fontSize: null, fontWeight: null, 'if': null, frame: null, cornerRadius: null, opacity: null, id: null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','list','form','section','toggle','textfield','securefield','picker','stepper','navigationstack','tabview','view','label']
+            },
+            zstack: {
+                attrs: { spacing: null, padding: null, alignment: ['leading','center','trailing','top','bottom'], foregroundColor: null, background: null, 'if': null, frame: null, cornerRadius: null, opacity: null, id: null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','view']
+            },
+            text: {
+                attrs: { font: ['largeTitle','title','title2','title3','headline','subheadline','body','callout','footnote','caption','caption2','system'], fontSize: null, fontWeight: ['ultraLight','thin','light','regular','medium','semibold','bold','heavy','black'], foregroundColor: ['white','black','red','orange','yellow','green','blue','purple','pink','cyan','gray','secondary','primary'], background: null, 'if': null, padding: null, frame: null, opacity: null, strikethrough: ['true','false'], navigationTitle: null, id: null },
+                children: []
+            },
+            image: {
+                attrs: { systemName: null, foregroundColor: ['white','black','red','orange','yellow','green','blue','purple','pink','cyan','gray','secondary','primary'], font: ['largeTitle','title','title2','title3','headline','subheadline','body','callout','footnote','caption','caption2','system'], fontSize: null, 'if': null, padding: null, frame: null, opacity: null, resizable: ['true','false'], id: null },
+                children: []
+            },
+            button: {
+                attrs: { action: null, foregroundColor: ['white','black','red','orange','yellow','green','blue','purple','pink','cyan','gray','secondary','primary'], font: null, fontSize: null, fontWeight: null, background: null, 'if': null, padding: null, frame: null, cornerRadius: null, opacity: null, id: null },
+                children: []
+            },
+            spacer: { attrs: { 'if': null }, children: [] },
+            divider: { attrs: { 'if': null, foregroundColor: null, padding: null }, children: [] },
+            list: {
+                attrs: { navigationTitle: null, padding: null, 'if': null, id: null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','section','view']
+            },
+            form: {
+                attrs: { navigationTitle: null, padding: null, 'if': null, id: null },
+                children: ['section','toggle','textfield','securefield','picker','stepper','button','text','divider','view']
+            },
+            section: {
+                attrs: { header: null, 'if': null },
+                children: ['toggle','textfield','securefield','picker','stepper','button','text','divider','view']
+            },
+            toggle: {
+                attrs: { key: null, value: ['true','false'], foregroundColor: null, 'if': null, id: null },
+                children: []
+            },
+            textfield: {
+                attrs: { key: null, value: null, foregroundColor: null, 'if': null, id: null },
+                children: []
+            },
+            securefield: {
+                attrs: { key: null, value: null, foregroundColor: null, 'if': null, id: null },
+                children: []
+            },
+            picker: {
+                attrs: { key: null, value: null, title: null, foregroundColor: null, 'if': null, id: null },
+                children: ['label']
+            },
+            stepper: {
+                attrs: { key: null, value: null, 'in': null, foregroundColor: null, 'if': null, id: null },
+                children: []
+            },
+            label: {
+                attrs: { tag: null, 'if': null },
+                children: []
+            },
+            navigationstack: {
+                attrs: { navigationTitle: null, tabItem: null, tag: null, 'if': null, id: null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','list','form','section','view']
+            },
+            tabview: {
+                attrs: { key: null, value: null, 'if': null, id: null },
+                children: ['navigationstack','vstack','hstack','zstack','view']
+            },
+            view: {
+                attrs: { id: null, src: null, 'if': null },
+                children: ['vstack','hstack','zstack','text','image','button','spacer','divider','list','form','section','toggle','textfield','securefield','picker','stepper','navigationstack','tabview','view']
+            }
+        };
+
+        // Convert schema to CodeMirror xml-hint format
+        function buildCMSchema() {
+            const s = {};
+            for (const [tag, def] of Object.entries(magicSchema)) {
+                if (tag === '!top') continue;
+                s[tag] = { attrs: {}, children: def.children || [] };
+                if (def.attrs) {
+                    for (const [attr, vals] of Object.entries(def.attrs)) {
+                        s[tag].attrs[attr] = vals;
+                    }
+                }
+            }
+            s['!top'] = magicSchema['!top'];
+            return s;
+        }
+
+        const cmSchema = buildCMSchema();
+
+        // Initialize CodeMirror
+        const cm = CodeMirror.fromTextArea(document.getElementById('editor-textarea'), {
+            mode: 'xml',
+            lineNumbers: true,
+            autoCloseTags: true,
+            matchTags: { bothTags: true },
+            autoCloseBrackets: true,
+            styleActiveLine: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            lineWrapping: false,
+            extraKeys: {
+                'Ctrl-Space': function(cm) { CodeMirror.showHint(cm, CodeMirror.hint.xml, { schemaInfo: cmSchema }); },
+                'Cmd-S': function() { saveContent(); return false; },
+                'Ctrl-S': function() { saveContent(); return false; },
+                "'<'": function(cm) {
+                    // Insert < then trigger hint
+                    cm.replaceSelection('<');
+                    CodeMirror.showHint(cm, CodeMirror.hint.xml, { schemaInfo: cmSchema, completeSingle: false });
+                },
+                "' '": function(cm) {
+                    // Insert space then maybe trigger attr hint if inside a tag
+                    var cur = cm.getCursor();
+                    var token = cm.getTokenAt(cur);
+                    cm.replaceSelection(' ');
+                    // If we're inside a tag, trigger hint
+                    var state = cm.getTokenAt(cm.getCursor()).state;
+                    if (state && state.tagName) {
+                        setTimeout(function() {
+                            CodeMirror.showHint(cm, CodeMirror.hint.xml, { schemaInfo: cmSchema, completeSingle: false });
+                        }, 50);
+                    }
+                },
+                Tab: function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection('add');
+                    } else {
+                        cm.replaceSelection('    ');
+                    }
+                }
+            }
+        });
+
+        // Fill editor container
+        cm.setSize('100%', '100%');
+
+        // -- App state --
+        const statusEl = document.getElementById('status');
+        const saveBtn = document.getElementById('saveBtn');
+        const currentLabel = document.getElementById('currentLabel');
+
+        let currentUser = 'petres';
+        let currentFamily = 'systemSmall';
+        const cache = {};
+
+        function cacheKey() { return currentUser + '_' + currentFamily; }
+        function updateLabel() { currentLabel.textContent = currentUser + ' / ' + currentFamily; }
+
+        function setStatus(msg, type) {
+            statusEl.textContent = msg;
+            statusEl.className = 'status ' + (type || '');
+            if (type === 'saved') setTimeout(function() { statusEl.textContent = ''; statusEl.className = 'status'; }, 3000);
+        }
+
+        function getContent() { return cm.getValue(); }
+        function setContent(text) { cm.setValue(text); }
+
+        cm.on('change', function() {
+            cache[cacheKey()] = getContent();
+        });
+
+        async function loadContent() {
+            var key = cacheKey();
+            if (cache[key] !== undefined) {
+                setContent(cache[key]);
+                updateLabel();
+                return;
+            }
+            updateLabel();
+            try {
+                var res = await fetch('api.php?action=load&user=' + currentUser + '&family=' + currentFamily);
+                var data = await res.json();
+                if (data.success) {
+                    setContent(data.content);
+                    cache[key] = data.content;
+                } else {
+                    setContent('');
+                    cache[key] = '';
+                    setStatus(data.error || 'No content yet', '');
+                }
+            } catch (e) {
+                setStatus('Failed to load', 'error');
+                setContent('');
+            }
+        }
+
+        async function saveContent() {
+            setStatus('Saving...', '');
+            try {
+                var res = await fetch('api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save',
+                        user: currentUser,
+                        family: currentFamily,
+                        content: getContent()
+                    })
+                });
+                var data = await res.json();
+                if (data.success) {
+                    cache[cacheKey()] = getContent();
+                    setStatus('Saved!', 'saved');
+                } else {
+                    setStatus(data.error || 'Save failed', 'error');
+                }
+            } catch (e) {
+                setStatus('Save failed', 'error');
+            }
+        }
+
+        // -- Templates --
+        var templates = {
+            clock: {
+                systemSmall: '<body>\n    <vstack spacing="4" padding="16">\n        <image systemName="clock.fill" foregroundColor="orange" font="title"/>\n        <text font="system" fontSize="42" fontWeight="bold" foregroundColor="white">12:45</text>\n        <text font="caption" foregroundColor="secondary">Saturday</text>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="20" padding="16">\n        <vstack spacing="4">\n            <image systemName="clock.fill" foregroundColor="orange" font="largeTitle"/>\n            <text font="system" fontSize="48" fontWeight="bold" foregroundColor="white">12:45</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="6">\n            <text font="headline" foregroundColor="white">Saturday</text>\n            <text font="subheadline" foregroundColor="secondary">April 4, 2026</text>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">Week 14</text>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            weather: {
+                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="sun.max.fill" foregroundColor="yellow" font="title"/>\n        <text font="system" fontSize="36" fontWeight="bold" foregroundColor="white">24\u00b0</text>\n        <text font="caption" foregroundColor="secondary">Sunny</text>\n        <text font="caption2" foregroundColor="secondary">H:28\u00b0 L:16\u00b0</text>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <image systemName="sun.max.fill" foregroundColor="yellow" font="largeTitle"/>\n            <text font="system" fontSize="42" fontWeight="bold" foregroundColor="white">24\u00b0</text>\n            <text font="subheadline" foregroundColor="secondary">Sunny</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Mon</text>\n                <spacer/>\n                <image systemName="cloud.sun.fill" foregroundColor="yellow"/>\n                <text font="caption" foregroundColor="white">22\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Tue</text>\n                <spacer/>\n                <image systemName="cloud.rain.fill" foregroundColor="cyan"/>\n                <text font="caption" foregroundColor="white">18\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Wed</text>\n                <spacer/>\n                <image systemName="sun.max.fill" foregroundColor="yellow"/>\n                <text font="caption" foregroundColor="white">26\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Thu</text>\n                <spacer/>\n                <image systemName="cloud.fill" foregroundColor="gray"/>\n                <text font="caption" foregroundColor="white">20\u00b0</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            quote: {
+                systemSmall: '<body>\n    <vstack spacing="8" padding="16">\n        <image systemName="quote.opening" foregroundColor="purple" font="caption"/>\n        <text font="subheadline" foregroundColor="white" fontWeight="medium">Stay hungry, stay foolish.</text>\n        <spacer/>\n        <text font="caption" foregroundColor="secondary">\u2014 Steve Jobs</text>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack padding="16" spacing="16">\n        <image systemName="quote.opening" foregroundColor="purple" font="title"/>\n        <vstack alignment="leading" spacing="8">\n            <text font="body" foregroundColor="white" fontWeight="medium">The only way to do great work is to love what you do.</text>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">\u2014 Steve Jobs</text>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            countdown: {
+                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="calendar.circle.fill" foregroundColor="red" font="title"/>\n        <text font="caption" foregroundColor="secondary">DAYS UNTIL</text>\n        <text font="headline" foregroundColor="white">Summer</text>\n        <text font="system" fontSize="36" fontWeight="bold" foregroundColor="red">78</text>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <image systemName="calendar.circle.fill" foregroundColor="red" font="largeTitle"/>\n            <text font="caption" foregroundColor="secondary">COUNTDOWN</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="6">\n            <text font="headline" foregroundColor="white">Summer Holiday</text>\n            <hstack spacing="12">\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="red">78</text>\n                    <text font="caption2" foregroundColor="secondary">DAYS</text>\n                </vstack>\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="orange">14</text>\n                    <text font="caption2" foregroundColor="secondary">HOURS</text>\n                </vstack>\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="yellow">32</text>\n                    <text font="caption2" foregroundColor="secondary">MINS</text>\n                </vstack>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            stats: {
+                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <hstack>\n            <image systemName="flame.fill" foregroundColor="orange"/>\n            <text font="caption" foregroundColor="secondary">Activity</text>\n        </hstack>\n        <text font="system" fontSize="32" fontWeight="bold" foregroundColor="white">8,421</text>\n        <text font="caption" foregroundColor="green">steps today</text>\n        <spacer/>\n        <hstack spacing="8">\n            <vstack>\n                <text font="caption2" foregroundColor="secondary">CAL</text>\n                <text font="caption" fontWeight="bold" foregroundColor="red">342</text>\n            </vstack>\n            <vstack>\n                <text font="caption2" foregroundColor="secondary">KM</text>\n                <text font="caption" fontWeight="bold" foregroundColor="cyan">6.2</text>\n            </vstack>\n        </hstack>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <hstack>\n                <image systemName="flame.fill" foregroundColor="orange"/>\n                <text font="headline" foregroundColor="white">Activity</text>\n            </hstack>\n            <text font="system" fontSize="36" fontWeight="bold" foregroundColor="white">8,421</text>\n            <text font="caption" foregroundColor="green">steps today</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="8">\n            <hstack>\n                <image systemName="heart.fill" foregroundColor="red" font="caption"/>\n                <text font="subheadline" foregroundColor="white">342 cal</text>\n            </hstack>\n            <hstack>\n                <image systemName="figure.walk" foregroundColor="cyan" font="caption"/>\n                <text font="subheadline" foregroundColor="white">6.2 km</text>\n            </hstack>\n            <hstack>\n                <image systemName="clock.fill" foregroundColor="yellow" font="caption"/>\n                <text font="subheadline" foregroundColor="white">48 min active</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            profile: {
+                systemSmall: '<body>\n    <vstack spacing="8" padding="16">\n        <image systemName="person.circle.fill" foregroundColor="blue" font="largeTitle"/>\n        <text font="headline" foregroundColor="white">John</text>\n        <text font="caption" foregroundColor="secondary">Online</text>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <image systemName="person.circle.fill" foregroundColor="blue" font="system" fontSize="56"/>\n        <vstack alignment="leading" spacing="4">\n            <text font="title3" fontWeight="bold" foregroundColor="white">John Doe</text>\n            <text font="subheadline" foregroundColor="secondary">iOS Developer</text>\n            <spacer/>\n            <hstack spacing="12">\n                <hstack spacing="4">\n                    <image systemName="envelope.fill" foregroundColor="blue" font="caption"/>\n                    <text font="caption" foregroundColor="secondary">12</text>\n                </hstack>\n                <hstack spacing="4">\n                    <image systemName="bell.fill" foregroundColor="orange" font="caption"/>\n                    <text font="caption" foregroundColor="secondary">3</text>\n                </hstack>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            checklist: {
+                systemSmall: '<body>\n    <vstack alignment="leading" spacing="6" padding="16">\n        <hstack>\n            <image systemName="checklist" foregroundColor="blue"/>\n            <text font="headline" foregroundColor="white">To Do</text>\n        </hstack>\n        <hstack>\n            <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n            <text font="caption" foregroundColor="secondary" strikethrough="true">Buy groceries</text>\n        </hstack>\n        <hstack>\n            <image systemName="circle" foregroundColor="gray" font="caption"/>\n            <text font="caption" foregroundColor="white">Call dentist</text>\n        </hstack>\n        <hstack>\n            <image systemName="circle" foregroundColor="gray" font="caption"/>\n            <text font="caption" foregroundColor="white">Finish report</text>\n        </hstack>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <image systemName="checklist" foregroundColor="blue"/>\n                <text font="headline" foregroundColor="white">To Do</text>\n            </hstack>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">2 of 5 done</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n                <text font="caption" foregroundColor="secondary" strikethrough="true">Buy groceries</text>\n            </hstack>\n            <hstack>\n                <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n                <text font="caption" foregroundColor="secondary" strikethrough="true">Send email</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Call dentist</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Finish report</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Clean kitchen</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            music: {
+                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="music.note" foregroundColor="pink" font="title"/>\n        <text font="headline" foregroundColor="white">Blinding Lights</text>\n        <text font="caption" foregroundColor="secondary">The Weeknd</text>\n        <spacer/>\n        <hstack spacing="16">\n            <image systemName="backward.fill" foregroundColor="white" font="caption"/>\n            <image systemName="pause.fill" foregroundColor="white" font="caption"/>\n            <image systemName="forward.fill" foregroundColor="white" font="caption"/>\n        </hstack>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <zstack>\n            <image systemName="opticaldisc.fill" foregroundColor="pink" font="system" fontSize="60"/>\n            <image systemName="music.note" foregroundColor="white" font="title3"/>\n        </zstack>\n        <vstack alignment="leading" spacing="4">\n            <text font="headline" foregroundColor="white">Blinding Lights</text>\n            <text font="subheadline" foregroundColor="secondary">The Weeknd \u2014 After Hours</text>\n            <spacer/>\n            <hstack spacing="20">\n                <image systemName="backward.fill" foregroundColor="white"/>\n                <image systemName="pause.fill" foregroundColor="white" font="title3"/>\n                <image systemName="forward.fill" foregroundColor="white"/>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
+            },
+            minimal: {
+                systemSmall: '<body>\n    <vstack padding="16">\n        <spacer/>\n        <text font="title2" fontWeight="bold" foregroundColor="white">Hello</text>\n        <text font="caption" foregroundColor="secondary">Have a great day</text>\n        <spacer/>\n    </vstack>\n</body>',
+                systemMedium: '<body>\n    <hstack padding="20">\n        <vstack alignment="leading" spacing="4">\n            <text font="title" fontWeight="bold" foregroundColor="white">Hello</text>\n            <text font="body" foregroundColor="secondary">Have a great day</text>\n        </vstack>\n        <spacer/>\n        <image systemName="sparkles" foregroundColor="yellow" font="largeTitle"/>\n    </hstack>\n</body>'
+            }
+        };
+
+        // Template buttons
+        document.querySelectorAll('.tpl-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var tpl = templates[btn.dataset.tpl];
+                if (tpl) {
+                    var xml = tpl[currentFamily] || tpl.systemSmall;
+                    setContent(xml);
+                    cache[cacheKey()] = xml;
+                }
+            });
+        });
+
+        // User switch
+        document.querySelectorAll('.user-switch button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                cache[cacheKey()] = getContent();
+                document.querySelectorAll('.user-switch button').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentUser = btn.dataset.user;
+                loadContent();
+            });
+        });
+
+        // Family switch
+        document.querySelectorAll('.family-switch button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                cache[cacheKey()] = getContent();
+                document.querySelectorAll('.family-switch button').forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentFamily = btn.dataset.family;
+                loadContent();
+            });
+        });
+
+        // Save button
+        saveBtn.addEventListener('click', saveContent);
+
+        // Initial load
+        loadContent();
+    </script>
+</body>
+</html>
