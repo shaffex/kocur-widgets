@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KOCUR NEWS</title>
+    <!-- Prevent WKWebView flicker: hide until JS has restored form state -->
+    <style>body { visibility: hidden; }</style>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -480,6 +482,7 @@ function restoreForm() {
 }
 
 restoreForm();
+document.body.style.visibility = 'visible';
 
 document.getElementById('pushForm').querySelectorAll('input, textarea, select').forEach(el => {
     el.addEventListener('input', saveForm);
@@ -498,9 +501,8 @@ document.getElementById('fillBtn').addEventListener('click', () => {
 
 document.getElementById('pushForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn    = document.getElementById('sendBtn');
-    const result = document.getElementById('result');
-    const form   = e.target;
+    const btn  = document.getElementById('sendBtn');
+    const form = e.target;
 
     const payload = {
         title:    form.title.value,
@@ -514,7 +516,13 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
 
     btn.disabled    = true;
     btn.textContent = 'Sending…';
-    result.style.display = 'none';
+    document.getElementById('resultPanel').style.display = 'none';
+    document.getElementById('result').style.display      = 'none';
+
+    let sentText   = '—';
+    let failedText = '—';
+    let tbodyHTML  = '';
+    let rawErrText = null;
 
     try {
         const res  = await fetch('sendPushNotification.php', {
@@ -527,52 +535,50 @@ document.getElementById('pushForm').addEventListener('submit', async (e) => {
         let json;
         try { json = JSON.parse(text); } catch { json = null; }
 
-        const panel    = document.getElementById('resultPanel');
-        const rawError = document.getElementById('rawError');
-        panel.style.display = 'block';
-
         if (json && json.status === 'ok') {
-            document.getElementById('rSent').textContent   = json.sent    ?? 0;
-            document.getElementById('rFailed').textContent = json.failed  ?? 0;
+            sentText   = String(json.sent   ?? 0);
+            failedText = String(json.failed ?? 0);
             if ((json.removed ?? 0) > 0) {
-                document.getElementById('rFailed').textContent =
-                    `${json.failed} (${json.removed} removed)`;
+                failedText = `${json.failed} (${json.removed} removed)`;
             }
-
-            const tbody = document.getElementById('resultBody');
-            tbody.innerHTML = '';
-            (json.details || []).forEach(d => {
+            tbodyHTML = (json.details || []).map(d => {
                 const ok      = d.httpCode === 200;
                 const reason  = d.response?.reason ?? (ok ? '—' : 'Unknown error');
-                const removed = d.removed ? ' 🗑 <em style="font-size:11px;color:#6e6e73">removed</em>' : '';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                const removed = d.removed
+                    ? ' 🗑 <em style="font-size:11px;color:#6e6e73">removed</em>' : '';
+                return `<tr>
                     <td><strong>${d.deviceModel || '—'}</strong></td>
                     <td class="${ok ? 'status-ok' : 'status-err'}">${ok ? '✅ OK' : '❌ Failed'}${removed}</td>
-                    <td style="color:#6e6e73;font-size:12px;font-family:monospace">${reason}</td>`;
-                tbody.appendChild(tr);
-            });
-            rawError.style.display = 'none';
+                    <td style="color:#6e6e73;font-size:12px;font-family:monospace">${reason}</td>
+                </tr>`;
+            }).join('');
         } else {
-            document.getElementById('rSent').textContent   = '—';
-            document.getElementById('rFailed').textContent = '—';
-            document.getElementById('resultBody').innerHTML = '';
-            rawError.style.display = 'block';
-            rawError.textContent   = text;
+            rawErrText = text;
         }
     } catch (err) {
-        const panel = document.getElementById('resultPanel');
+        rawErrText = 'Request failed: ' + err.message;
+    }
+
+    // Apply all DOM changes in one frame to avoid reflows/flicker
+    requestAnimationFrame(() => {
+        const panel    = document.getElementById('resultPanel');
         const rawError = document.getElementById('rawError');
-        panel.style.display    = 'block';
-        rawError.style.display = 'block';
-        rawError.textContent   = 'Request failed: ' + err.message;
-        document.getElementById('rSent').textContent   = '—';
-        document.getElementById('rFailed').textContent = '—';
-        document.getElementById('resultBody').innerHTML = '';
-    } finally {
+
+        document.getElementById('rSent').textContent   = sentText;
+        document.getElementById('rFailed').textContent = failedText;
+        document.getElementById('resultBody').innerHTML = tbodyHTML;
+
+        if (rawErrText !== null) {
+            rawError.textContent   = rawErrText;
+            rawError.style.display = 'block';
+        } else {
+            rawError.style.display = 'none';
+        }
+
         btn.disabled    = false;
         btn.textContent = 'Send to All <?= $count ?> Device<?= $count !== 1 ? 's' : '' ?>';
-    }
+        panel.style.display = 'block';
+    });
 });
 </script>
 
