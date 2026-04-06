@@ -1,0 +1,10 @@
+
+<body>
+  <intentbutton action="playSystemSound:1036" buttonStyle="plain">
+  <vstack>
+    <text font="largeTitle">🐈‍⬛🐈‍⬛</text>
+    <text font="title" foregroundColor="blue">Kocur</text>
+    <text font="caption" foregroundColor="secondary">uz home</text>
+  </vstack>
+    </intentbutton>
+</body>

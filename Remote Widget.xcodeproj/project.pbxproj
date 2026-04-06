@@ -416,6 +416,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Remote-Widget-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "🐈‍⬛ Widget";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs camera to scan barcodes";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -455,6 +456,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Remote-Widget-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "🐈‍⬛ Widget";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs camera to scan barcodes";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;

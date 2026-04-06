@@ -97,6 +97,127 @@
             margin-left: 8px;
             font-size: 11px;
         }
+
+        .btn-save-tpl {
+            padding: 4px 10px;
+            border: 1px solid #a6e3a1;
+            border-radius: 6px;
+            background: transparent;
+            color: #a6e3a1;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .btn-save-tpl:hover { background: #a6e3a1; color: #1e1e2e; }
+
+        /* ── Save Template modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.6);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #313244;
+            border: 1px solid #45475a;
+            border-radius: 14px;
+            padding: 24px;
+            width: 320px;
+            max-width: 90vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,.5);
+        }
+        .modal h3 { font-size: 16px; font-weight: 600; color: #cdd6f4; margin-bottom: 16px; }
+        .modal label { font-size: 12px; color: #6c7086; text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 6px; }
+        .modal input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            background: #1e1e2e;
+            border: 1.5px solid #45475a;
+            border-radius: 8px;
+            color: #cdd6f4;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+        .modal input[type="text"]:focus { border-color: #a6e3a1; }
+        .modal-hint { font-size: 11px; color: #6c7086; margin-top: -12px; margin-bottom: 16px; }
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .modal-actions button {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-modal-cancel { background: #45475a; color: #cdd6f4; }
+        .btn-modal-cancel:hover { background: #585b70; }
+        .btn-modal-confirm { background: #a6e3a1; color: #1e1e2e; }
+        .btn-modal-confirm:hover { background: #94e2d5; }
+
+        /* ── Mobile responsive ── */
+        @media (max-width: 640px) {
+            header {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+            header h1 {
+                font-size: 15px;
+                flex: 1;
+            }
+            .actions {
+                order: -1;
+                margin-left: auto;
+            }
+            .user-switch {
+                order: 2;
+                flex: 1;
+            }
+            .family-switch {
+                order: 3;
+            }
+            .user-switch button {
+                padding: 7px 14px;
+                font-size: 13px;
+                min-height: 36px;
+            }
+            .family-switch button {
+                padding: 7px 10px;
+                font-size: 13px;
+                min-height: 36px;
+            }
+            .btn-save {
+                padding: 8px 16px;
+                font-size: 14px;
+                min-height: 36px;
+            }
+            .status {
+                display: none;
+            }
+            .templates-bar {
+                padding: 6px 10px;
+                gap: 4px;
+            }
+            .tpl-btn {
+                padding: 6px 8px;
+                font-size: 11px;
+                min-height: 32px;
+            }
+            .pane-header {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            .CodeMirror {
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -109,6 +230,7 @@
         <div class="family-switch">
             <button class="active" data-family="systemSmall">Small</button>
             <button data-family="systemMedium">Medium</button>
+            <button data-family="systemLarge">Large</button>
         </div>
         <div class="actions">
             <span class="status" id="status"></span>
@@ -120,16 +242,22 @@
             <div class="pane-header">XML Widget — <span id="currentLabel">petres / systemSmall</span></div>
             <div class="templates-bar">
                 <span>Templates:</span>
-                <button class="tpl-btn" data-tpl="clock">Clock</button>
-                <button class="tpl-btn" data-tpl="weather">Weather</button>
-                <button class="tpl-btn" data-tpl="quote">Quote</button>
-                <button class="tpl-btn" data-tpl="countdown">Countdown</button>
-                <button class="tpl-btn" data-tpl="stats">Stats</button>
-                <button class="tpl-btn" data-tpl="profile">Profile Card</button>
-                <button class="tpl-btn" data-tpl="checklist">Checklist</button>
-                <button class="tpl-btn" data-tpl="music">Now Playing</button>
-                <button class="tpl-btn" data-tpl="minimal">Minimal</button>
+                <button class="btn-save-tpl" id="saveTplBtn">＋ Save Template</button>
             </div>
+
+    <!-- Save Template modal -->
+    <div class="modal-overlay" id="saveTplModal">
+        <div class="modal">
+            <h3>💾 Save as Template</h3>
+            <label for="tplNameInput">Template name</label>
+            <input type="text" id="tplNameInput" placeholder="my-template" maxlength="48" autocomplete="off" spellcheck="false">
+            <p class="modal-hint">Letters, numbers and hyphens only.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" id="saveTplCancel">Cancel</button>
+                <button class="btn-modal-confirm" id="saveTplConfirm">Save</button>
+            </div>
+        </div>
+    </div>
             <div id="editor-container"><textarea id="editor-textarea"></textarea></div>
         </div>
     </main>
@@ -356,55 +484,113 @@
         }
 
         // -- Templates --
-        var templates = {
-            clock: {
-                systemSmall: '<body>\n    <vstack spacing="4" padding="16">\n        <image systemName="clock.fill" foregroundColor="orange" font="title"/>\n        <text font="system" fontSize="42" fontWeight="bold" foregroundColor="white">12:45</text>\n        <text font="caption" foregroundColor="secondary">Saturday</text>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="20" padding="16">\n        <vstack spacing="4">\n            <image systemName="clock.fill" foregroundColor="orange" font="largeTitle"/>\n            <text font="system" fontSize="48" fontWeight="bold" foregroundColor="white">12:45</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="6">\n            <text font="headline" foregroundColor="white">Saturday</text>\n            <text font="subheadline" foregroundColor="secondary">April 4, 2026</text>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">Week 14</text>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            weather: {
-                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="sun.max.fill" foregroundColor="yellow" font="title"/>\n        <text font="system" fontSize="36" fontWeight="bold" foregroundColor="white">24\u00b0</text>\n        <text font="caption" foregroundColor="secondary">Sunny</text>\n        <text font="caption2" foregroundColor="secondary">H:28\u00b0 L:16\u00b0</text>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <image systemName="sun.max.fill" foregroundColor="yellow" font="largeTitle"/>\n            <text font="system" fontSize="42" fontWeight="bold" foregroundColor="white">24\u00b0</text>\n            <text font="subheadline" foregroundColor="secondary">Sunny</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Mon</text>\n                <spacer/>\n                <image systemName="cloud.sun.fill" foregroundColor="yellow"/>\n                <text font="caption" foregroundColor="white">22\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Tue</text>\n                <spacer/>\n                <image systemName="cloud.rain.fill" foregroundColor="cyan"/>\n                <text font="caption" foregroundColor="white">18\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Wed</text>\n                <spacer/>\n                <image systemName="sun.max.fill" foregroundColor="yellow"/>\n                <text font="caption" foregroundColor="white">26\u00b0</text>\n            </hstack>\n            <hstack>\n                <text font="caption" foregroundColor="secondary">Thu</text>\n                <spacer/>\n                <image systemName="cloud.fill" foregroundColor="gray"/>\n                <text font="caption" foregroundColor="white">20\u00b0</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            quote: {
-                systemSmall: '<body>\n    <vstack spacing="8" padding="16">\n        <image systemName="quote.opening" foregroundColor="purple" font="caption"/>\n        <text font="subheadline" foregroundColor="white" fontWeight="medium">Stay hungry, stay foolish.</text>\n        <spacer/>\n        <text font="caption" foregroundColor="secondary">\u2014 Steve Jobs</text>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack padding="16" spacing="16">\n        <image systemName="quote.opening" foregroundColor="purple" font="title"/>\n        <vstack alignment="leading" spacing="8">\n            <text font="body" foregroundColor="white" fontWeight="medium">The only way to do great work is to love what you do.</text>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">\u2014 Steve Jobs</text>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            countdown: {
-                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="calendar.circle.fill" foregroundColor="red" font="title"/>\n        <text font="caption" foregroundColor="secondary">DAYS UNTIL</text>\n        <text font="headline" foregroundColor="white">Summer</text>\n        <text font="system" fontSize="36" fontWeight="bold" foregroundColor="red">78</text>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <image systemName="calendar.circle.fill" foregroundColor="red" font="largeTitle"/>\n            <text font="caption" foregroundColor="secondary">COUNTDOWN</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="6">\n            <text font="headline" foregroundColor="white">Summer Holiday</text>\n            <hstack spacing="12">\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="red">78</text>\n                    <text font="caption2" foregroundColor="secondary">DAYS</text>\n                </vstack>\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="orange">14</text>\n                    <text font="caption2" foregroundColor="secondary">HOURS</text>\n                </vstack>\n                <vstack>\n                    <text font="system" fontSize="32" fontWeight="bold" foregroundColor="yellow">32</text>\n                    <text font="caption2" foregroundColor="secondary">MINS</text>\n                </vstack>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            stats: {
-                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <hstack>\n            <image systemName="flame.fill" foregroundColor="orange"/>\n            <text font="caption" foregroundColor="secondary">Activity</text>\n        </hstack>\n        <text font="system" fontSize="32" fontWeight="bold" foregroundColor="white">8,421</text>\n        <text font="caption" foregroundColor="green">steps today</text>\n        <spacer/>\n        <hstack spacing="8">\n            <vstack>\n                <text font="caption2" foregroundColor="secondary">CAL</text>\n                <text font="caption" fontWeight="bold" foregroundColor="red">342</text>\n            </vstack>\n            <vstack>\n                <text font="caption2" foregroundColor="secondary">KM</text>\n                <text font="caption" fontWeight="bold" foregroundColor="cyan">6.2</text>\n            </vstack>\n        </hstack>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack spacing="4">\n            <hstack>\n                <image systemName="flame.fill" foregroundColor="orange"/>\n                <text font="headline" foregroundColor="white">Activity</text>\n            </hstack>\n            <text font="system" fontSize="36" fontWeight="bold" foregroundColor="white">8,421</text>\n            <text font="caption" foregroundColor="green">steps today</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="8">\n            <hstack>\n                <image systemName="heart.fill" foregroundColor="red" font="caption"/>\n                <text font="subheadline" foregroundColor="white">342 cal</text>\n            </hstack>\n            <hstack>\n                <image systemName="figure.walk" foregroundColor="cyan" font="caption"/>\n                <text font="subheadline" foregroundColor="white">6.2 km</text>\n            </hstack>\n            <hstack>\n                <image systemName="clock.fill" foregroundColor="yellow" font="caption"/>\n                <text font="subheadline" foregroundColor="white">48 min active</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            profile: {
-                systemSmall: '<body>\n    <vstack spacing="8" padding="16">\n        <image systemName="person.circle.fill" foregroundColor="blue" font="largeTitle"/>\n        <text font="headline" foregroundColor="white">John</text>\n        <text font="caption" foregroundColor="secondary">Online</text>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <image systemName="person.circle.fill" foregroundColor="blue" font="system" fontSize="56"/>\n        <vstack alignment="leading" spacing="4">\n            <text font="title3" fontWeight="bold" foregroundColor="white">John Doe</text>\n            <text font="subheadline" foregroundColor="secondary">iOS Developer</text>\n            <spacer/>\n            <hstack spacing="12">\n                <hstack spacing="4">\n                    <image systemName="envelope.fill" foregroundColor="blue" font="caption"/>\n                    <text font="caption" foregroundColor="secondary">12</text>\n                </hstack>\n                <hstack spacing="4">\n                    <image systemName="bell.fill" foregroundColor="orange" font="caption"/>\n                    <text font="caption" foregroundColor="secondary">3</text>\n                </hstack>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            checklist: {
-                systemSmall: '<body>\n    <vstack alignment="leading" spacing="6" padding="16">\n        <hstack>\n            <image systemName="checklist" foregroundColor="blue"/>\n            <text font="headline" foregroundColor="white">To Do</text>\n        </hstack>\n        <hstack>\n            <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n            <text font="caption" foregroundColor="secondary" strikethrough="true">Buy groceries</text>\n        </hstack>\n        <hstack>\n            <image systemName="circle" foregroundColor="gray" font="caption"/>\n            <text font="caption" foregroundColor="white">Call dentist</text>\n        </hstack>\n        <hstack>\n            <image systemName="circle" foregroundColor="gray" font="caption"/>\n            <text font="caption" foregroundColor="white">Finish report</text>\n        </hstack>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <image systemName="checklist" foregroundColor="blue"/>\n                <text font="headline" foregroundColor="white">To Do</text>\n            </hstack>\n            <spacer/>\n            <text font="caption" foregroundColor="secondary">2 of 5 done</text>\n        </vstack>\n        <divider/>\n        <vstack alignment="leading" spacing="4">\n            <hstack>\n                <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n                <text font="caption" foregroundColor="secondary" strikethrough="true">Buy groceries</text>\n            </hstack>\n            <hstack>\n                <image systemName="checkmark.circle.fill" foregroundColor="green" font="caption"/>\n                <text font="caption" foregroundColor="secondary" strikethrough="true">Send email</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Call dentist</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Finish report</text>\n            </hstack>\n            <hstack>\n                <image systemName="circle" foregroundColor="gray" font="caption"/>\n                <text font="caption" foregroundColor="white">Clean kitchen</text>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            music: {
-                systemSmall: '<body>\n    <vstack spacing="6" padding="16">\n        <image systemName="music.note" foregroundColor="pink" font="title"/>\n        <text font="headline" foregroundColor="white">Blinding Lights</text>\n        <text font="caption" foregroundColor="secondary">The Weeknd</text>\n        <spacer/>\n        <hstack spacing="16">\n            <image systemName="backward.fill" foregroundColor="white" font="caption"/>\n            <image systemName="pause.fill" foregroundColor="white" font="caption"/>\n            <image systemName="forward.fill" foregroundColor="white" font="caption"/>\n        </hstack>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack spacing="16" padding="16">\n        <zstack>\n            <image systemName="opticaldisc.fill" foregroundColor="pink" font="system" fontSize="60"/>\n            <image systemName="music.note" foregroundColor="white" font="title3"/>\n        </zstack>\n        <vstack alignment="leading" spacing="4">\n            <text font="headline" foregroundColor="white">Blinding Lights</text>\n            <text font="subheadline" foregroundColor="secondary">The Weeknd \u2014 After Hours</text>\n            <spacer/>\n            <hstack spacing="20">\n                <image systemName="backward.fill" foregroundColor="white"/>\n                <image systemName="pause.fill" foregroundColor="white" font="title3"/>\n                <image systemName="forward.fill" foregroundColor="white"/>\n            </hstack>\n        </vstack>\n    </hstack>\n</body>'
-            },
-            minimal: {
-                systemSmall: '<body>\n    <vstack padding="16">\n        <spacer/>\n        <text font="title2" fontWeight="bold" foregroundColor="white">Hello</text>\n        <text font="caption" foregroundColor="secondary">Have a great day</text>\n        <spacer/>\n    </vstack>\n</body>',
-                systemMedium: '<body>\n    <hstack padding="20">\n        <vstack alignment="leading" spacing="4">\n            <text font="title" fontWeight="bold" foregroundColor="white">Hello</text>\n            <text font="body" foregroundColor="secondary">Have a great day</text>\n        </vstack>\n        <spacer/>\n        <image systemName="sparkles" foregroundColor="yellow" font="largeTitle"/>\n    </hstack>\n</body>'
-            }
+        const familySuffix = {
+            systemSmall: 'small',
+            systemMedium: 'medium',
+            systemLarge: 'large'
         };
 
-        // Template buttons
-        document.querySelectorAll('.tpl-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var tpl = templates[btn.dataset.tpl];
-                if (tpl) {
-                    var xml = tpl[currentFamily] || tpl.systemSmall;
-                    setContent(xml);
-                    cache[cacheKey()] = xml;
+        function formatTemplateName(name) {
+            return name.replace(/[-_]/g, ' ')
+                       .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        async function loadTemplate(name, family) {
+            const suffix = familySuffix[family] || 'small';
+            const url = 'Templates/' + name + '_' + suffix + '.xml';
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Template not found: ' + url);
+            return res.text();
+        }
+
+        async function refreshTemplateBar() {
+            const bar       = document.querySelector('.templates-bar');
+            const saveBtn   = document.getElementById('saveTplBtn');
+            // Remove existing template buttons, keep the label and Save button
+            bar.querySelectorAll('.tpl-btn').forEach(b => b.remove());
+
+            try {
+                const res = await fetch('api.php?action=list_templates&family=' + encodeURIComponent(currentFamily));
+                const data = await res.json();
+                if (!data.success) return;
+
+                data.templates.forEach(function(name) {
+                    const btn = document.createElement('button');
+                    btn.className = 'tpl-btn';
+                    btn.dataset.tpl = name;
+                    btn.textContent = formatTemplateName(name);
+                    btn.addEventListener('click', async function() {
+                        try {
+                            const xml = await loadTemplate(name, currentFamily);
+                            setContent(xml);
+                            cache[cacheKey()] = xml;
+                        } catch (e) {
+                            setStatus('Template load failed', 'error');
+                        }
+                    });
+                    bar.insertBefore(btn, saveBtn);
+                });
+            } catch (e) {
+                setStatus('Could not load templates list', 'error');
+            }
+        }
+
+        // -- Save Template modal --
+        const saveTplModal   = document.getElementById('saveTplModal');
+        const tplNameInput   = document.getElementById('tplNameInput');
+        const saveTplConfirm = document.getElementById('saveTplConfirm');
+
+        document.getElementById('saveTplBtn').addEventListener('click', function() {
+            tplNameInput.value = '';
+            saveTplModal.classList.add('open');
+            tplNameInput.focus();
+        });
+
+        document.getElementById('saveTplCancel').addEventListener('click', function() {
+            saveTplModal.classList.remove('open');
+        });
+
+        saveTplModal.addEventListener('click', function(e) {
+            if (e.target === saveTplModal) saveTplModal.classList.remove('open');
+        });
+
+        tplNameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') saveTplConfirm.click();
+            if (e.key === 'Escape') saveTplModal.classList.remove('open');
+        });
+
+        saveTplConfirm.addEventListener('click', async function() {
+            const rawName = tplNameInput.value.trim();
+            if (!rawName) { tplNameInput.focus(); return; }
+
+            saveTplConfirm.disabled = true;
+            saveTplConfirm.textContent = 'Saving…';
+
+            try {
+                const res = await fetch('api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action:  'save_template',
+                        family:  currentFamily,
+                        name:    rawName,
+                        content: getContent()
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    saveTplModal.classList.remove('open');
+                    setStatus('Template "' + data.name + '" saved!', 'saved');
+                    await refreshTemplateBar();
+                } else {
+                    setStatus(data.error || 'Save failed', 'error');
                 }
-            });
+            } catch (e) {
+                setStatus('Save failed', 'error');
+            } finally {
+                saveTplConfirm.disabled = false;
+                saveTplConfirm.textContent = 'Save';
+            }
         });
 
         // User switch
@@ -425,6 +611,7 @@
                 document.querySelectorAll('.family-switch button').forEach(function(b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 currentFamily = btn.dataset.family;
+                refreshTemplateBar();
                 loadContent();
             });
         });
@@ -433,6 +620,7 @@
         saveBtn.addEventListener('click', saveContent);
 
         // Initial load
+        refreshTemplateBar();
         loadContent();
     </script>
 </body>

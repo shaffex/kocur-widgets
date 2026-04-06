@@ -7,11 +7,33 @@ if (!is_dir($dataDir)) {
 }
 
 $allowedUsers = ['petres', 'lukes'];
-$allowedFamilies = ['systemSmall', 'systemMedium'];
+$allowedFamilies = ['systemSmall', 'systemMedium', 'systemLarge'];
 
 function getDataFile(string $user, string $family): string {
     global $dataDir;
     return "$dataDir/{$user}_{$family}.xml";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'list_templates') {
+    $familySuffix = [
+        'systemSmall'  => 'small',
+        'systemMedium' => 'medium',
+        'systemLarge'  => 'large',
+    ];
+    $family = $_GET['family'] ?? 'systemSmall';
+    $suffix = $familySuffix[$family] ?? 'small';
+
+    $templatesDir = __DIR__ . '/Templates';
+    $names = [];
+    if (is_dir($templatesDir)) {
+        foreach (glob("$templatesDir/*_{$suffix}.xml") as $file) {
+            $base = basename($file, "_{$suffix}.xml");
+            $names[] = $base;
+        }
+        sort($names);
+    }
+    echo json_encode(['success' => true, 'templates' => $names]);
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'load') {
@@ -35,8 +57,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'load') 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
-    $user = $input['user'] ?? '';
-    $family = $input['family'] ?? '';
+
+    if ($action === 'save_template') {
+        $familySuffix = [
+            'systemSmall'  => 'small',
+            'systemMedium' => 'medium',
+            'systemLarge'  => 'large',
+        ];
+        $family  = $input['family']  ?? '';
+        $name    = $input['name']    ?? '';
+        $content = $input['content'] ?? '';
+
+        $suffix = $familySuffix[$family] ?? null;
+        if (!$suffix || !in_array($family, $allowedFamilies)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid family']);
+            exit;
+        }
+
+        // Sanitise name: lowercase, only letters/digits/hyphens
+        $name = strtolower(trim($name));
+        $name = preg_replace('/[^a-z0-9\-]/', '-', $name);
+        $name = preg_replace('/-+/', '-', trim($name, '-'));
+        if ($name === '') {
+            echo json_encode(['success' => false, 'error' => 'Invalid template name']);
+            exit;
+        }
+
+        $file = __DIR__ . "/Templates/{$name}_{$suffix}.xml";
+        if (file_put_contents($file, $content) !== false) {
+            echo json_encode(['success' => true, 'name' => $name]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to write template file']);
+        }
+        exit;
+    }
+
+    $user    = $input['user']    ?? '';
+    $family  = $input['family']  ?? '';
     $content = $input['content'] ?? '';
 
     if ($action !== 'save') {
