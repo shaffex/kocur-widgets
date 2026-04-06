@@ -1,13 +1,17 @@
 <body>
+    
     <form navigationTitle="Settings">
-        <text>In progres ...</text>
-        <toggle key="isShowingSearch" value="true">Search Tab</toggle>
-        <toggle key="isShowingFavorites" value="true">Favorites Tab</toggle>
-
+        <section>
+            <navigationlink destination="webSendPush">Send Push</navigationlink>
+        </section>
+        
         <section footer="Access only for Kumove">
             <text badge="1.0 beta">Version</text>
 
         </section>
 
     </form>
+    
+    <webview id="webSendPush">url:https://magic-ui.com/KumWidgets/PushNotifications/index.php?simpleMode=1</webview>
+    
 </body>

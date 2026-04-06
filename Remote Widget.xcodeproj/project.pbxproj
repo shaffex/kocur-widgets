@@ -12,6 +12,9 @@
 		2F14B71B2F7EA6DE00DE5212 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2F14B7232F7EA6FD00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B7222F7EA6FD00DE5212 /* MagicWidget */; };
 		2F14B72D2F7EAB5B00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B72C2F7EAB5B00DE5212 /* MagicWidget */; };
+		2F529F662F83C927008DBC6A /* meow0.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F652F83C927008DBC6A /* meow0.wav */; };
+		2F529F692F83CB0A008DBC6A /* meow2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F682F83CB0A008DBC6A /* meow2.wav */; };
+		2F529F6A2F83CB0A008DBC6A /* meow1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F672F83CB0A008DBC6A /* meow1.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,9 @@
 		2F14B6932F7EA17300DE5212 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F14B7742F8288E700DE5212 /* WidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
+		2F529F652F83C927008DBC6A /* meow0.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow0.wav; sourceTree = "<group>"; };
+		2F529F672F83CB0A008DBC6A /* meow1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow1.wav; sourceTree = "<group>"; };
+		2F529F682F83CB0A008DBC6A /* meow2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow2.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -57,9 +63,18 @@
 		2F14B77E2F82D3B100DE5212 /* Exceptions for "Remote Widget" folder in "WidgetExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				LiveActivitySharedCode.swift,
+				SharedCode/Config.swift,
+				SharedCode/LiveActivitySharedCode.swift,
+				SharedCode/PushToken.swift,
 			);
 			target = 2F14B70D2F7EA6DC00DE5212 /* WidgetExtensionExtension */;
+		};
+		2F529F602F83B1D0008DBC6A /* Exceptions for "Remote Widget" folder in "Remote Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Server/uploadPushToken.php,
+			);
+			target = 2F14B67C2F7EA07A00DE5212 /* Remote Widget */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -67,6 +82,7 @@
 		2F14B67F2F7EA07A00DE5212 /* Remote Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				2F529F602F83B1D0008DBC6A /* Exceptions for "Remote Widget" folder in "Remote Widget" target */,
 				2F14B77E2F82D3B100DE5212 /* Exceptions for "Remote Widget" folder in "WidgetExtensionExtension" target */,
 			);
 			path = "Remote Widget";
@@ -107,6 +123,9 @@
 		2F14B6742F7EA07A00DE5212 = {
 			isa = PBXGroup;
 			children = (
+				2F529F652F83C927008DBC6A /* meow0.wav */,
+				2F529F672F83CB0A008DBC6A /* meow1.wav */,
+				2F529F682F83CB0A008DBC6A /* meow2.wav */,
 				2F14B7742F8288E700DE5212 /* WidgetExtensionExtension.entitlements */,
 				2F14B67F2F7EA07A00DE5212 /* Remote Widget */,
 				2F14B7112F7EA6DC00DE5212 /* WidgetExtension */,
@@ -230,6 +249,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F529F662F83C927008DBC6A /* meow0.wav in Resources */,
+				2F529F692F83CB0A008DBC6A /* meow2.wav in Resources */,
+				2F529F6A2F83CB0A008DBC6A /* meow1.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +416,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Remote Widget/Remote Widget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X47885HM53;
@@ -432,6 +455,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Remote Widget/Remote Widget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = X47885HM53;
