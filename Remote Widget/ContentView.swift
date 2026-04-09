@@ -21,6 +21,16 @@ struct ContentView: View {
     
     var body: some View {
         MagicUiView(resource: "Main")
+            .onFirstAppear {
+                SxEnvironmentObject.shared.setValue("fff", forKey: "DEVICE_UUID")
+                SxMagicVariables.shared.setValue("MIW", forKey: "DEVICE_UUID")
+                //SxMagicVariables.shared.setValue("MIW", forKey: "DEVICE_UUID")
+                
+                // we can update only when view is loaded
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                    SxEnvironmentObject.shared.setValue( UIDevice.current.identifierForVendor?.uuidString ?? "N/A", forKey: "DEVICE_UUID")
+                }
+            }
     }
 }
 

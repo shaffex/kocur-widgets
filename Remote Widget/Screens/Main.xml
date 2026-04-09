@@ -3,6 +3,11 @@
         <navigationstack tabItem="label:Home;systemImage:house" tag="Home">
             <remoteview src="resource:Home"/>
         </navigationstack>
+        
+        <navigationstack tabItem="label:Messages;systemImage:bubble.left" tag="Messages">
+            <remoteview viewId="chatView" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php"/>
+<!--            <remoteview viewId="chatView" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php??showApnsStatus=1&amp;showBadges=1"/>-->
+        </navigationstack>
 
         <navigationstack tabItem="label:Settings;systemImage:gear" tag="Settings">
             <remoteview src="resource:Settings"/>

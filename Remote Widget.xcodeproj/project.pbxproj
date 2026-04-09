@@ -12,9 +12,15 @@
 		2F14B71B2F7EA6DE00DE5212 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2F14B7232F7EA6FD00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B7222F7EA6FD00DE5212 /* MagicWidget */; };
 		2F14B72D2F7EAB5B00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B72C2F7EAB5B00DE5212 /* MagicWidget */; };
-		2F529F662F83C927008DBC6A /* meow0.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F652F83C927008DBC6A /* meow0.wav */; };
-		2F529F692F83CB0A008DBC6A /* meow2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F682F83CB0A008DBC6A /* meow2.wav */; };
-		2F529F6A2F83CB0A008DBC6A /* meow1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2F529F672F83CB0A008DBC6A /* meow1.wav */; };
+		2FC703362F86AF64009457F7 /* meow9.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703352F86AF64009457F7 /* meow9.wav */; };
+		2FC703372F86AF64009457F7 /* meow5.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703312F86AF64009457F7 /* meow5.wav */; };
+		2FC703382F86AF64009457F7 /* meow8.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703342F86AF64009457F7 /* meow8.wav */; };
+		2FC703392F86AF64009457F7 /* meow4.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703302F86AF64009457F7 /* meow4.wav */; };
+		2FC7033A2F86AF64009457F7 /* meow3.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC7032F2F86AF64009457F7 /* meow3.wav */; };
+		2FC7033B2F86AF64009457F7 /* meow1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC7032D2F86AF64009457F7 /* meow1.wav */; };
+		2FC7033C2F86AF64009457F7 /* meow6.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703322F86AF64009457F7 /* meow6.wav */; };
+		2FC7033D2F86AF64009457F7 /* meow7.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703332F86AF64009457F7 /* meow7.wav */; };
+		2FC7033E2F86AF64009457F7 /* meow2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC7032E2F86AF64009457F7 /* meow2.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,9 +53,15 @@
 		2F14B6932F7EA17300DE5212 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F14B7742F8288E700DE5212 /* WidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
-		2F529F652F83C927008DBC6A /* meow0.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow0.wav; sourceTree = "<group>"; };
-		2F529F672F83CB0A008DBC6A /* meow1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow1.wav; sourceTree = "<group>"; };
-		2F529F682F83CB0A008DBC6A /* meow2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow2.wav; sourceTree = "<group>"; };
+		2FC7032D2F86AF64009457F7 /* meow1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow1.wav; sourceTree = "<group>"; };
+		2FC7032E2F86AF64009457F7 /* meow2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow2.wav; sourceTree = "<group>"; };
+		2FC7032F2F86AF64009457F7 /* meow3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow3.wav; sourceTree = "<group>"; };
+		2FC703302F86AF64009457F7 /* meow4.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow4.wav; sourceTree = "<group>"; };
+		2FC703312F86AF64009457F7 /* meow5.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow5.wav; sourceTree = "<group>"; };
+		2FC703322F86AF64009457F7 /* meow6.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow6.wav; sourceTree = "<group>"; };
+		2FC703332F86AF64009457F7 /* meow7.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow7.wav; sourceTree = "<group>"; };
+		2FC703342F86AF64009457F7 /* meow8.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow8.wav; sourceTree = "<group>"; };
+		2FC703352F86AF64009457F7 /* meow9.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow9.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -115,9 +127,15 @@
 		2F14B6742F7EA07A00DE5212 = {
 			isa = PBXGroup;
 			children = (
-				2F529F652F83C927008DBC6A /* meow0.wav */,
-				2F529F672F83CB0A008DBC6A /* meow1.wav */,
-				2F529F682F83CB0A008DBC6A /* meow2.wav */,
+				2FC7032D2F86AF64009457F7 /* meow1.wav */,
+				2FC7032E2F86AF64009457F7 /* meow2.wav */,
+				2FC7032F2F86AF64009457F7 /* meow3.wav */,
+				2FC703302F86AF64009457F7 /* meow4.wav */,
+				2FC703312F86AF64009457F7 /* meow5.wav */,
+				2FC703322F86AF64009457F7 /* meow6.wav */,
+				2FC703332F86AF64009457F7 /* meow7.wav */,
+				2FC703342F86AF64009457F7 /* meow8.wav */,
+				2FC703352F86AF64009457F7 /* meow9.wav */,
 				2F14B7742F8288E700DE5212 /* WidgetExtensionExtension.entitlements */,
 				2F14B67F2F7EA07A00DE5212 /* Remote Widget */,
 				2F14B7112F7EA6DC00DE5212 /* WidgetExtension */,
@@ -241,9 +259,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F529F662F83C927008DBC6A /* meow0.wav in Resources */,
-				2F529F692F83CB0A008DBC6A /* meow2.wav in Resources */,
-				2F529F6A2F83CB0A008DBC6A /* meow1.wav in Resources */,
+				2FC703362F86AF64009457F7 /* meow9.wav in Resources */,
+				2FC703372F86AF64009457F7 /* meow5.wav in Resources */,
+				2FC703382F86AF64009457F7 /* meow8.wav in Resources */,
+				2FC703392F86AF64009457F7 /* meow4.wav in Resources */,
+				2FC7033A2F86AF64009457F7 /* meow3.wav in Resources */,
+				2FC7033B2F86AF64009457F7 /* meow1.wav in Resources */,
+				2FC7033C2F86AF64009457F7 /* meow6.wav in Resources */,
+				2FC7033D2F86AF64009457F7 /* meow7.wav in Resources */,
+				2FC7033E2F86AF64009457F7 /* meow2.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

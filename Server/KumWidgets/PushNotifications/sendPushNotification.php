@@ -23,7 +23,7 @@ define('APNS_TEAM_ID',         'X47885HM53');
 define('APNS_TOPIC',           'com.shaffex.remotewidget');
 define('APNS_HOST_PROD',       'https://api.push.apple.com');
 define('APNS_HOST_SANDBOX',    'https://api.sandbox.push.apple.com');
-define('REMOVE_DEAD_TOKENS',   false);   // set false to keep invalid tokens in tokens.json
+define('REMOVE_DEAD_TOKENS',   true);   // set false to keep invalid tokens in tokens.json
 
 // ── bootstrap ──────────────────────────────────────────────────────────────
 header('Content-Type: application/json');
@@ -182,6 +182,28 @@ foreach ($tokens as $deviceUUID => $info) {
 $ts = date('Y-m-d H:i:s');
 logLine("[$ts] -- SEND END   -- sent={$results['sent']} failed={$results['failed']} removed={$results['removed']}");
 logLine('');
+
+// ── append to chat history ─────────────────────────────────────────────────
+$chatHistoryFile = __DIR__ . '/chatHistory.json';
+$chatHistory = file_exists($chatHistoryFile)
+    ? json_decode(file_get_contents($chatHistoryFile), true) ?: []
+    : [];
+
+$entry = [
+    'timestamp' => date('c'),
+    'title'     => $title,
+    'body'      => $body,
+];
+if ($subtitle !== null) $entry['subtitle'] = $subtitle;
+if ($badge !== null)    $entry['badge']    = $badge;
+$entry['sound']   = $sound;
+if (!empty($custom))    $entry['data']     = $custom;
+$entry['sandbox'] = $sandbox;
+$entry['sent']    = $results['sent'];
+$entry['failed']  = $results['failed'];
+
+$chatHistory[] = $entry;
+file_put_contents($chatHistoryFile, json_encode($chatHistory, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
 
 // persist cleaned-up tokens.json if any tokens were removed
 if ($tokensModified) {

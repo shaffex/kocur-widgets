@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="<?= $simpleMode ? '#ffffff' : '#f2f2f7' ?>">
     <title>KOCUR NEWS</title>
     <script>
     // Runs before body is parsed — restoreForm() defined here so it can be
@@ -24,13 +25,30 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        html { background: <?= $simpleMode ? '#fff' : '#f2f2f7' ?>; }
+        html {
+            background: <?= $simpleMode ? '#fff' : '#f2f2f7' ?>;
+            color-scheme: light;
+            overflow-x: hidden;
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: #f2f2f7;
             color: #1c1c1e;
             padding: 32px 24px;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
         }
 
         h1 {
@@ -80,6 +98,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
+            table-layout: fixed;
         }
 
         thead th {
@@ -102,13 +121,15 @@
         tbody td {
             padding: 10px 12px;
             vertical-align: middle;
+            overflow-wrap: anywhere;
         }
 
         .token {
             font-family: monospace;
             font-size: 11px;
             color: #6e6e73;
-            max-width: 180px;
+            display: block;
+            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -319,12 +340,45 @@
             background: #fdecea; color: #c0392b;
             border-radius: 12px; font-size: 13px;
             white-space: pre-wrap; font-family: monospace;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 16px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .stats,
+            .result-summary {
+                flex-direction: column;
+            }
+
+            table,
+            #resultDetail {
+                font-size: 12px;
+            }
+
+            thead th,
+            tbody td,
+            #resultDetail th,
+            #resultDetail td {
+                padding: 8px 6px;
+            }
         }
     </style>
 </head>
 <body<?= $simpleMode ? ' class="simple"' : '' ?>>
 
-<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">
+<div class="page-header">
     <h1>📲 KOCUR NEWS</h1>
     <button type="button" id="fillBtn" style="font-size:12px;padding:5px 12px;border-radius:20px;border:1.5px solid #0071e3;background:none;color:#0071e3;cursor:pointer;font-weight:600;">✏️ Fill 🐈‍⬛ Data</button>
 </div>
@@ -426,9 +480,9 @@ $count = count($tokens);
                 <?php if ($simpleMode): ?>
                 <select name="sound">
                     <option value="default">default</option>
-                    <option value="meow0.wav">meow0.wav</option>
-                    <option value="meow1.wav">meow1.wav</option>
-                    <option value="meow2.wav">meow2.wav</option>
+<?php for ($i = 1; $i <= 9; $i++): ?>
+                    <option value="meow<?= $i ?>.wav">meow<?= $i ?></option>
+<?php endfor; ?>
                 </select>
                 <?php else: ?>
                 <input type="text" name="sound" placeholder="default" value="default">

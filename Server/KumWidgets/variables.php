@@ -20,14 +20,20 @@ foreach ($allowedUsers as $u) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#f2f2f7">
     <title>Variables</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { background: #fff; }
+        html {
+            background: #f2f2f7;
+            color-scheme: light;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f2f2f7;
             color: #1c1c1e;
             padding: 16px;
+            min-height: 100vh;
             overscroll-behavior: none;
         }
         .header {
@@ -324,4 +330,3 @@ document.getElementById('newValInput').addEventListener('keydown', e => {
 </script>
 </body>
 </html>
-

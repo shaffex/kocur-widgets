@@ -10,7 +10,7 @@
         
         <section footer="Access only for Kumove">
             <text badge="$SYSTEM_BUNDLE.VERSION ($SYSTEM_BUNDLE.BUILD)">Version</text>
-
+            <text badge="$DEVICE_UUID">DeviceId</text>
         </section>
 
     </form>

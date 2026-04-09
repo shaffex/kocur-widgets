@@ -205,34 +205,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 echo json_encode(['success' => false, 'error' => 'Invalid request']);
 
 function regenerateUserFile(string $user): void {
-    global $dataDir, $allowedFamilies;
+    global $allowedFamilies;
 
     $phpFile = __DIR__ . "/{$user}.php";
 
-    // Read all family XMLs for this user
-    $families = [];
-    foreach ($allowedFamilies as $family) {
-        $file = getDataFile($user, $family);
-        if (file_exists($file)) {
-            $families[$family] = file_get_contents($file);
-        }
-    }
-
-    // Generate PHP file that serves by ?family= param, substituting {{VARIABLES}} at runtime
+    // Generate PHP file that reads the latest XML from disk at request time.
     $code = "<?php\n";
     $code .= "header('Content-Type: text/xml; charset=utf-8');\n";
+    $code .= "header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');\n";
+    $code .= "header('Pragma: no-cache');\n";
+    $code .= "header('Expires: 0');\n";
     $code .= "\$family = \$_GET['family'] ?? 'systemSmall';\n\n";
     $code .= "// Load per-user variables ({{KEY}} → value)\n";
     $code .= "\$_vf   = __DIR__ . '/data/variables_{$user}.json';\n";
     $code .= "\$_vars = file_exists(\$_vf) ? (json_decode(file_get_contents(\$_vf), true) ?: []) : [];\n\n";
-    $code .= "\$widgets = [\n";
-    foreach ($families as $family => $xml) {
-        $escaped = var_export($xml, true);
-        $code .= "    '$family' => $escaped,\n";
-    }
-    $code .= "];\n\n";
-    $code .= "if (isset(\$widgets[\$family])) {\n";
-    $code .= "    \$_xml = \$widgets[\$family];\n";
+    $code .= "\$allowedFamilies = " . var_export($allowedFamilies, true) . ";\n";
+    $code .= "if (in_array(\$family, \$allowedFamilies, true)) {\n";
+    $code .= "    \$_file = __DIR__ . '/data/{$user}_' . \$family . '.xml';\n";
+    $code .= "    if (!file_exists(\$_file)) {\n";
+    $code .= "        http_response_code(404);\n";
+    $code .= "        echo '<error>Missing widget file for family: ' . htmlspecialchars(\$family) . '</error>';\n";
+    $code .= "        exit;\n";
+    $code .= "    }\n";
+    $code .= "    \$_xml = file_get_contents(\$_file);\n";
     $code .= "    foreach (\$_vars as \$_k => \$_v) {\n";
     $code .= "        \$_xml = str_replace('{{' . \$_k . '}}', htmlspecialchars(\$_v, ENT_XML1, 'UTF-8'), \$_xml);\n";
     $code .= "    }\n";
