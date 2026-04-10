@@ -1,0 +1,18 @@
+<body>
+
+    <remoteview sheet="isPresented:viewNewMessage" viewId="chatView" navTrailing="id:btnRefresh" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php"/>
+    
+    
+<!--            <remoteview viewId="chatView" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php??showApnsStatus=1&amp;showBadges=1"/>-->
+    
+    
+<!--    <button id="btnRefresh" action="reloadView:viewId:chatView">Refresh</button>-->
+
+    <hstack id="btnRefresh">
+        <button id="btnRefresh" action="reloadView:viewId:chatView">Refresh</button>
+        <button action="presentSheet:isPresented:viewNewMessage">New</button>
+    </hstack>
+    
+    <remoteview id="viewNewMessage" src="resource:NewMessage"/>
+    
+</body>

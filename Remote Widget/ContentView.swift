@@ -10,7 +10,10 @@ import MagicUiFramework
 
 struct ContentView: View {
     init() {
+        // actions
         MagicUiView.installActionPlugin(name: "updateVariablesToServer", plugin: SxAction_updateVariablesToServer.self)
+        
+        MagicUiView.installActionPlugin(name: "sendMessage", plugin: SxAction_sendMessage.self)
         
         MagicUiView.installActionPlugin(name: "reloadAllTimelines", plugin: SxAction_reloadAllTimelines.self)
         

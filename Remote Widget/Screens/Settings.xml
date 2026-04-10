@@ -2,7 +2,7 @@
     
     <form navigationTitle="Settings">
         <section>
-            <navigationlink destination="webSendPush">Send Push</navigationlink>
+<!--            <navigationlink destination="webSendPush">Send Push</navigationlink>-->
             <navigationlink destination="webVariables">Set Variables</navigationlink>
         </section>
         

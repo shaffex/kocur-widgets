@@ -1,0 +1,39 @@
+<body>
+    
+    <navigationstack viewId="sheetViewNewMessage">
+    <form xpresentationDetents="[medium,large]" navigationTitle="Message to 🐈‍⬛">
+    
+        <vstack alignment="leading">
+        <text foregroundStyle="secondary">Message Title</text>
+        <textfield disableAutocorrection="true" key="msgTitle">Type Message Title</textfield>
+        </vstack>
+        
+        <vstack alignment="leading">
+        <text foregroundStyle="secondary">Message Body</text>
+        <textfield disableAutocorrection="true" axis="vertical" key="msgBody">Body</textfield>
+        </vstack>
+        
+        
+        
+        <picker key="msgSound" value="default" title="Miw Sound">
+            <text tag="default">default</text>
+            <text tag="meow1.wav">meow1</text>
+            <text tag="meow2.wav">meow2</text>
+            <text tag="meow3.wav">meow3</text>
+            <text tag="meow4.wav">meow4</text>
+            <text tag="meow5.wav">meow5</text>
+            <text tag="meow6.wav">meow6</text>
+            <text tag="meow7.wav">meow7</text>
+            <text tag="meow8.wav">meow8</text>
+            <text tag="meow9.wav">meow9</text>
+        </picker>
+        
+        <button action="sendMessage">Send message to 🐈‍⬛</button>
+        
+    </form>
+    </navigationstack>
+    
+    
+    
+    
+</body>

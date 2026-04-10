@@ -51,7 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     $time     = isset($entry['timestamp']) ? esc(relativeTime($entry['timestamp'])) : '';
     $fullTime = isset($entry['timestamp']) ? esc(date('M j, Y g:i A', strtotime($entry['timestamp']))) : '';
 ?>
-        <vstack alignment="leading" spacing="4" padding="top:8;bottom:8" navTrailing="id:btnRefresh">
+        <vstack alignment="leading" spacing="4" padding="top:8;bottom:8">
             <hstack>
                 <text font="headline"><?= $title ?></text>
                 <spacer/>
@@ -85,5 +85,5 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <?php endif; ?>
     </list>
 
-    <button id="btnRefresh" action="reloadView:viewId:chatView">Refresh</button>
+    
 </body>

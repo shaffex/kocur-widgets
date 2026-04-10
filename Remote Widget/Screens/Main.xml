@@ -4,9 +4,8 @@
             <remoteview src="resource:Home"/>
         </navigationstack>
         
-        <navigationstack tabItem="label:Messages;systemImage:bubble.left" tag="Messages">
-            <remoteview viewId="chatView" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php"/>
-<!--            <remoteview viewId="chatView" src="url:https://magic-ui.com/KumWidgets/PushNotifications/chatHistory.php??showApnsStatus=1&amp;showBadges=1"/>-->
+        <navigationstack tabItem="label:🐈‍⬛ Messenger;systemImage:bubble.left" tag="Messages">
+            <remoteview src="resource:Chat"/>
         </navigationstack>
 
         <navigationstack tabItem="label:Settings;systemImage:gear" tag="Settings">
@@ -14,5 +13,14 @@
         </navigationstack>
     </tabview>
 
+    
+    <dialogs>
+        <alert id="alertMessageSent" messageTitle="Sent">
+        </alert>
+        
+        <alert id="alertMessageFailed" alertTitle="Sending Failed" alertMessage="$msgError">
+        </alert>
+    </dialogs>
+    
 </body>
 
