@@ -456,6 +456,34 @@
         let currentFamily = 'systemSmall';
         const cache = {};
 
+        // Allow ?user=lukes&family=systemSmall to preselect on load
+        (function applyQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const allowedUsers    = ['petres', 'lukes'];
+            const allowedFamilies = ['systemSmall', 'systemMedium', 'systemLarge'];
+
+            const userParam = (params.get('user') || '').toLowerCase();
+            if (allowedUsers.includes(userParam)) {
+                currentUser = userParam;
+            }
+
+            let familyParam = params.get('family') || '';
+            const familyAlias = { small: 'systemSmall', medium: 'systemMedium', large: 'systemLarge' };
+            if (familyAlias[familyParam.toLowerCase()]) {
+                familyParam = familyAlias[familyParam.toLowerCase()];
+            }
+            if (allowedFamilies.includes(familyParam)) {
+                currentFamily = familyParam;
+            }
+
+            document.querySelectorAll('.user-switch button').forEach(function(b) {
+                b.classList.toggle('active', b.dataset.user === currentUser);
+            });
+            document.querySelectorAll('.family-switch button').forEach(function(b) {
+                b.classList.toggle('active', b.dataset.family === currentFamily);
+            });
+        })();
+
         function cacheKey() { return currentUser + '_' + currentFamily; }
         function updateLabel() { currentLabel.textContent = currentUser + ' / ' + currentFamily; }
 

@@ -1,0 +1,58 @@
+<body>
+
+    <list navigationTitle="Widgets" navTrailing="id:menuOptions"  onAppear="delay:0.01:reloadView:viewId:previewSmallWidget">
+        <section header="Small Widget">
+            
+        <vstack alignment="leading">
+        <text foregroundStyle="secondary">Kocur Emojis</text>
+        <textfield disableAutocorrection="true" value="🐈‍⬛" key="kocurEmojis">Type Kocur new emojis</textfield>
+        </vstack>
+        
+        <vstack alignment="leading">
+        <text foregroundStyle="secondary">Kocur Status</text>
+        <textfield autocapitalization="none" disableAutocorrection="true" key="kocurStatus">Type Kocur new status</textfield>
+        </vstack>
+        
+        <toggle key="kocurIsNewVideo">New Video</toggle>
+        
+<!--        <text>KumMode: $kumMode</text>-->
+<!--        <text>WidgetUrl: $kumWidgetUrl</text>-->
+        
+        <hstack listRowBackground="brown">
+        <remoteview viewId="previewSmallWidget" width="170" height="170" background="systemBackground" cornerRadius="16"  src="url:$kumWidgetUrl?family=systemSmall"/>
+        
+<!--        <remoteview viewId="previewSmallWidget" width="158" height="158" background="systemBackground" cornerRadius="16"  src="url:https://magic-ui.com/KumWidgets/lukes.php?family=systemSmall"/>-->
+        
+        </hstack>
+        
+        
+        
+<!--        <text>setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo</text>-->
+        
+        <button action="setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo\\updateWidgetsOnAllDevices">Update Kocur Status</button>
+        
+        
+        </section>
+        
+        
+        
+        
+        
+        
+        
+    </list>
+
+    <hstack id="menuOptions">
+    <menu title="Options" systemImage="ellipsis">
+        
+        <button action="reloadView:viewId:previewSmallWidget">Refresh Widget preview</button>
+        
+        <button action="openUrl:https://magic-ui.com/KumWidgets/index.html?user=$kumMode&amp;family=systemSmall">Edit in Browser</button>
+        
+        <button action="updateWidgetsOnAllDevices">Update Widgets on all devices</button>
+    </menu>
+    </hstack>
+    
+    <event onValueChanged="kumWidgetUrl" action="reloadView:viewId:previewSmallWidget"/>
+    
+</body>

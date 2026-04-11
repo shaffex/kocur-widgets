@@ -4,8 +4,12 @@
             <remoteview src="resource:Home"/>
         </navigationstack>
         
-        <navigationstack tabItem="label:🐈‍⬛ Messenger;systemImage:bubble.left" tag="Messages">
+        <navigationstack tabItem="label:Messenger;systemImage:bubble.left" tag="Messages">
             <remoteview src="resource:Chat"/>
+        </navigationstack>
+        
+        <navigationstack tabItem="label:Widgets;systemImage:square.grid.2x2" tag="Widgets">
+            <remoteview src="resource:Widgets"/>
         </navigationstack>
 
         <navigationstack tabItem="label:Settings;systemImage:gear" tag="Settings">
@@ -21,6 +25,10 @@
         <alert id="alertMessageFailed" alertTitle="Sending Failed" alertMessage="$msgError">
         </alert>
     </dialogs>
+    
+    <setDefault key="kumMode" type="string" value="petres"/>
+    <setDefault key="kumWidgetUrl" type="string" value="https://magic-ui.com/KumWidgets/petres.php"/>
+    
     
 </body>
 

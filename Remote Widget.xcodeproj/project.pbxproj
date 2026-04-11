@@ -62,6 +62,7 @@
 		2FC703332F86AF64009457F7 /* meow7.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow7.wav; sourceTree = "<group>"; };
 		2FC703342F86AF64009457F7 /* meow8.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow8.wav; sourceTree = "<group>"; };
 		2FC703352F86AF64009457F7 /* meow9.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = meow9.wav; sourceTree = "<group>"; };
+		2FC703F32F8AB7AF009457F7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -127,6 +128,7 @@
 		2F14B6742F7EA07A00DE5212 = {
 			isa = PBXGroup;
 			children = (
+				2FC703F32F8AB7AF009457F7 /* README.md */,
 				2FC7032D2F86AF64009457F7 /* meow1.wav */,
 				2FC7032E2F86AF64009457F7 /* meow2.wav */,
 				2FC7032F2F86AF64009457F7 /* meow3.wav */,

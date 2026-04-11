@@ -23,12 +23,44 @@ function getVariablesFile(string $user): string {
 function getVariables(string $user): array {
     $file = getVariablesFile($user);
     if (!file_exists($file)) return [];
-    return json_decode(file_get_contents($file), true) ?: [];
+    $fp = fopen($file, 'r');
+    if (!$fp) return [];
+    flock($fp, LOCK_SH);
+    $contents = stream_get_contents($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    return json_decode($contents, true) ?: [];
 }
 
-function saveVariables(string $user, array $vars): void {
+/**
+ * Atomically read-modify-write the per-user variables file.
+ * $mutator receives the current array by reference and mutates it.
+ * Returns the resulting array.
+ */
+function mutateVariables(string $user, callable $mutator): array {
+    $file = getVariablesFile($user);
+    $fp = fopen($file, 'c+');
+    if (!$fp) {
+        throw new RuntimeException("Cannot open variables file for $user");
+    }
+    flock($fp, LOCK_EX);
+
+    $contents = stream_get_contents($fp);
+    $vars = json_decode($contents, true);
+    if (!is_array($vars)) $vars = [];
+
+    $mutator($vars);
     ksort($vars);
-    file_put_contents(getVariablesFile($user), json_encode($vars, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    $encoded = json_encode($vars, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, $encoded);
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    return $vars;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -101,14 +133,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'error' => 'variables must be an object']);
             exit;
         }
-        $vars = getVariables($user);
-        foreach ($incoming as $rawKey => $value) {
-            $key = strtoupper(preg_replace('/[^A-Za-z0-9_]/', '_', trim($rawKey)));
-            $key = trim($key, '_');
-            if ($key === '') continue;
-            $vars[$key] = (string)$value;
-        }
-        saveVariables($user, $vars);
+        $vars = mutateVariables($user, function (array &$vars) use ($incoming) {
+            foreach ($incoming as $rawKey => $value) {
+                $key = strtoupper(preg_replace('/[^A-Za-z0-9_]/', '_', trim($rawKey)));
+                $key = trim($key, '_');
+                if ($key === '') continue;
+                $vars[$key] = (string)$value;
+            }
+        });
         echo json_encode(['success' => true, 'variables' => $vars]);
         exit;
     }
@@ -122,9 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'error' => 'Invalid user or key']);
             exit;
         }
-        $vars = getVariables($user);
-        $vars[$key] = $value;
-        saveVariables($user, $vars);
+        mutateVariables($user, function (array &$vars) use ($key, $value) {
+            $vars[$key] = (string)$value;
+        });
         echo json_encode(['success' => true, 'key' => $key]);
         exit;
     }
@@ -136,9 +168,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'error' => 'Invalid user']);
             exit;
         }
-        $vars = getVariables($user);
-        unset($vars[$key]);
-        saveVariables($user, $vars);
+        mutateVariables($user, function (array &$vars) use ($key) {
+            unset($vars[$key]);
+        });
         echo json_encode(['success' => true]);
         exit;
     }

@@ -2,8 +2,16 @@
     
     <form navigationTitle="Settings">
         <section>
+            
+            <picker key="kumMode" title="Kum Mode">
+                <text tag="petres">Petres</text>
+                <text tag="lukes">Lukes</text>
+            </picker>
+            
+            
+            
 <!--            <navigationlink destination="webSendPush">Send Push</navigationlink>-->
-            <navigationlink destination="webVariables">Set Variables</navigationlink>
+<!--            <navigationlink destination="webVariables">Set Variables</navigationlink>-->
         </section>
         
 <!--        <button action="updateVariablesToServer">Update status</button>-->
@@ -17,5 +25,8 @@
     
     <webview id="webSendPush">url:https://magic-ui.com/KumWidgets/PushNotifications/index.php?simpleMode=1</webview>
     <webview id="webVariables">url:https://magic-ui.com/KumWidgets/variables.php</webview>
+    
+    
+    <event onValueChanged="kumMode" action="setString:kumWidgetUrl=https://magic-ui.com/KumWidgets/$kumMode{{EMPTY}}.php\\reloadView:viewId:previewSmallWidget"/>
     
 </body>

@@ -14,7 +14,11 @@ struct ContentView: View {
         MagicUiView.installActionPlugin(name: "updateVariablesToServer", plugin: SxAction_updateVariablesToServer.self)
         
         MagicUiView.installActionPlugin(name: "sendMessage", plugin: SxAction_sendMessage.self)
-        
+
+        MagicUiView.installActionPlugin(name: "setVariable", plugin: SxAction_setVariable.self)
+
+        MagicUiView.installActionPlugin(name: "updateWidgetsOnAllDevices", plugin: SxAction_updateWidgetsOnAllDevices.self)
+
         MagicUiView.installActionPlugin(name: "reloadAllTimelines", plugin: SxAction_reloadAllTimelines.self)
         
         // live activity

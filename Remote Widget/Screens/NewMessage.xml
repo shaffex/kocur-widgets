@@ -9,8 +9,8 @@
         </vstack>
         
         <vstack alignment="leading">
-        <text foregroundStyle="secondary">Message Body</text>
-        <textfield disableAutocorrection="true" axis="vertical" key="msgBody">Body</textfield>
+        <text foregroundStyle="secondary">Message Text</text>
+        <textfield disableAutocorrection="true" axis="vertical" key="msgBody">Type Message Text</textfield>
         </vstack>
         
         
