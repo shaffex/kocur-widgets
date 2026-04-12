@@ -8,6 +8,10 @@
             <remoteview src="resource:Chat"/>
         </navigationstack>
         
+        <navigationstack tabItem="label:Status;systemImage:circle" tag="Status">
+            <remoteview src="resource:Status"/>
+        </navigationstack>
+        
         <navigationstack tabItem="label:Widgets;systemImage:square.grid.2x2" tag="Widgets">
             <remoteview src="resource:Widgets"/>
         </navigationstack>

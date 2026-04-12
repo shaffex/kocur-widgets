@@ -150,6 +150,56 @@ struct SxAction_updateWidgetsOnAllDevices: SxActionProtocol {
     }
 }
 
+enum StatusHistory {
+    static func log(status: String, emojis: String, isNewVideo: Bool, user: String) async throws {
+        guard let url = URL(string: "https://magic-ui.com/KumWidgets/statusHistory.php") else {
+            throw URLError(.badURL)
+        }
+
+        let payload: [String: Any] = [
+            "status":     status,
+            "emojis":     emojis,
+            "isNewVideo": isNewVideo,
+            "user":       user
+        ]
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+    }
+}
+
+struct SxAction_logStatusUpdate: SxActionProtocol {
+    let node: MagicNode?
+
+    func execute(_ actionString: String) {
+        let vars = SxMagicVariables.shared
+        let status     = vars.value(forKey: "kocurStatus")     as? String ?? ""
+        let emojis     = vars.value(forKey: "kocurEmojis")     as? String ?? ""
+        let isNewVideo = vars.value(forKey: "kocurIsNewVideo") as? String ?? "false"
+
+        guard !status.isEmpty else { return }
+
+        Task { @MainActor in
+            do {
+                try await StatusHistory.log(
+                    status: status,
+                    emojis: emojis,
+                    isNewVideo: isNewVideo == "true" || isNewVideo == "1", user: BusinessLogic.shared.currentUser
+                )
+            } catch {
+                SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "statusError")
+            }
+        }
+    }
+}
+
 struct SxAction_setVariable: SxActionProtocol {
     let node: MagicNode?
 

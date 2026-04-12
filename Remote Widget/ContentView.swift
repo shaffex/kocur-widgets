@@ -19,11 +19,17 @@ struct ContentView: View {
 
         MagicUiView.installActionPlugin(name: "updateWidgetsOnAllDevices", plugin: SxAction_updateWidgetsOnAllDevices.self)
 
+        MagicUiView.installActionPlugin(name: "logStatusUpdate", plugin: SxAction_logStatusUpdate.self)
+
         MagicUiView.installActionPlugin(name: "reloadAllTimelines", plugin: SxAction_reloadAllTimelines.self)
         
         // live activity
         MagicUiView.installActionPlugin(name: "startLiveActivity", plugin: SxAction_startLiveActivity.self)
         MagicUiView.installActionPlugin(name: "updateLiveActivity", plugin: SxAction_updateLiveActivity.self)
+        
+        
+        // modifiers
+        MagicUiView.installModifierPlugin(name: "hideKeyboardOnTap", plugin: Modifier_hideKeyboardOnTap.self)
     }
     
     var body: some View {

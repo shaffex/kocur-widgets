@@ -1,0 +1,11 @@
+<body>
+
+    <remoteview sheet="isPresented:viewNewMessage" viewId="statusView" navTrailing="id:btnRefresh" src="url:https://magic-ui.com/KumWidgets/statusHistory.php" onAppear="reloadView:viewId:statusView"/>
+    
+    <hstack id="btnRefresh">
+        <button id="btnRefresh" action="reloadView:viewId:statusView">Refresh</button>
+    </hstack>
+    
+    <remoteview id="viewNewMessage" src="resource:NewMessage"/>
+    
+</body>

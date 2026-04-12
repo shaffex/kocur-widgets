@@ -1,6 +1,6 @@
 <body>
 
-    <list navigationTitle="Widgets" navTrailing="id:menuOptions"  onAppear="delay:0.01:reloadView:viewId:previewSmallWidget">
+    <list navigationTitle="Widgets" navTrailing="id:menuOptions"  onAppear="delay:0.01:reloadView:viewId:previewSmallWidget" hideKeyboardOnTap="">
         <section header="Small Widget">
             
         <vstack alignment="leading">
@@ -29,7 +29,14 @@
         
 <!--        <text>setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo</text>-->
         
-        <button action="setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo\\updateWidgetsOnAllDevices">Update Kocur Status</button>
+        
+        
+<!--        <button buttonStyle="borderedProminent" buttonStyle="plain" action="logStatusUpdate">TEST status log</button>-->
+<!--        <button buttonStyle="borderedProminent" action="playSystemSound:1036">TEST kkc</button>-->
+        
+        
+        
+        <button buttonStyle="borderedProminent"  action="playSystemSound:4095\\setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo\\logStatusUpdate\\updateWidgetsOnAllDevices">Update Kocur Status</button>
         
         
         </section>
