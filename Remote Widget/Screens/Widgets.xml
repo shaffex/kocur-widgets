@@ -10,7 +10,7 @@
         
         <vstack alignment="leading">
         <text foregroundStyle="secondary">Kocur Status</text>
-        <textfield autocapitalization="none" disableAutocorrection="true" key="kocurStatus">Type Kocur new status</textfield>
+        <textfield axis="vertical" autocapitalization="none" disableAutocorrection="true" key="kocurStatus">Type Kocur new status</textfield>
         </vstack>
         
         <toggle key="kocurIsNewVideo">New Video</toggle>
@@ -19,7 +19,7 @@
 <!--        <text>WidgetUrl: $kumWidgetUrl</text>-->
         
         <hstack listRowBackground="brown">
-        <remoteview viewId="previewSmallWidget" width="170" height="170" background="systemBackground" cornerRadius="16"  src="url:$kumWidgetUrl?family=systemSmall"/>
+        <remoteview viewId="previewSmallWidget" width="170" height="170" background="systemBackground" cornerRadius="16"  src="url:$kumWidgetUrl?family=systemSmall&amp;mode=preview"/>
         
 <!--        <remoteview viewId="previewSmallWidget" width="158" height="158" background="systemBackground" cornerRadius="16"  src="url:https://magic-ui.com/KumWidgets/lukes.php?family=systemSmall"/>-->
         

@@ -18,6 +18,19 @@ if (in_array($family, $allowedFamilies, true)) {
         exit;
     }
     $_xml = file_get_contents($_file);
+    $_preview = !empty($_GET['mode']) && $_GET['mode'] === 'preview';
+    if ($_preview) {
+        // Remove \\-separated segments that contain {{...}} from attribute values
+        $_xml = preg_replace_callback('/(="[^"]*")/', function ($m) {
+            $val = substr($m[1], 2, -1); // strip =" and "
+            $parts = explode('\\\\', $val);
+            $filtered = array_filter($parts, function ($p) {
+                return !preg_match('/\{\{[^}]+\}\}/', $p);
+            });
+            $result = implode('\\\\', $filtered);
+            return '="' . $result . '"';
+        }, $_xml);
+    }
     foreach ($_vars as $_k => $_v) {
         $_xml = str_replace('{{' . $_k . '}}', htmlspecialchars($_v, ENT_XML1, 'UTF-8'), $_xml);
     }

@@ -2,6 +2,21 @@
 
 ```
 <body>
+<viewthatfits onAppear="setInt:kState=1\\setString:kocurEmojis=🐈‍⬛\\setBool:kocurIsNewVideo=true\\setString:kocurStatus=Kocur se cesi na update kocur app">
+<vstack spacing="4">
+<intentbutton action="playSystemSound:1033" buttonStyle="plain">
+<text font="largeTitle">$kocurEmojis</text>
+</intentbutton>
+<!--  <text font="title" bold="true">Kocur</text>  -->
+<text if="js:$kState==1" font="body" xlineLimit="2" foregroundColor="green" minimumScaleFactor="0.5" multilineTextAlignment="center">$kocurStatus</text>
+<text if="js:$kState==2">MIW</text>
+<!--  if kocurNewVideo is true  -->
+<text if="js:$kocurIsNewVideo" font="caption" xpadding="4" background="red" cornerRadius="8">NEW VIDEO!</text>
+</vstack>
+</viewthatfits>
+</body>
+
+<body>
   <intentbutton action="playSystemSound:1033" buttonStyle="plain" onAppear="setInt:kState=1\\setString:kocurEmojis={{EMOJIS}}\\setBool:kocurIsNewVideo={{IS_NEWVIDEO}}\\setString:kocurStatus={{STATUS}}">
     <vstack spacing="4">
       <text font="largeTitle">$kocurEmojis</text>

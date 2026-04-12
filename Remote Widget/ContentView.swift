@@ -30,6 +30,7 @@ struct ContentView: View {
         
         // modifiers
         MagicUiView.installModifierPlugin(name: "hideKeyboardOnTap", plugin: Modifier_hideKeyboardOnTap.self)
+        MagicUiView.installModifierPlugin(name: "contentShapeRect", plugin: Modifier_contentShapeRect.self)
     }
     
     var body: some View {

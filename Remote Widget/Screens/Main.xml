@@ -1,5 +1,5 @@
 <body>
-    <tabview key="selectedTab" value="Home">
+    <tabview key="selectedTab" value="Home" sheet="isPresented:viewNewMessage">
         <navigationstack tabItem="label:Home;systemImage:house" tag="Home">
             <remoteview src="resource:Home"/>
         </navigationstack>
@@ -33,6 +33,8 @@
     <setDefault key="kumMode" type="string" value="petres"/>
     <setDefault key="kumWidgetUrl" type="string" value="https://magic-ui.com/KumWidgets/petres.php"/>
     
+    
+    <remoteview id="viewNewMessage" src="resource:NewMessage"/>
     
 </body>
 
