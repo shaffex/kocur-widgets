@@ -19,6 +19,8 @@ struct ContentView: View {
 
         MagicUiView.installActionPlugin(name: "updateWidgetsOnAllDevices", plugin: SxAction_updateWidgetsOnAllDevices.self)
 
+        MagicUiView.installActionPlugin(name: "updateKocurStatus", plugin: SxAction_updateKocurStatus.self)
+
         MagicUiView.installActionPlugin(name: "logStatusUpdate", plugin: SxAction_logStatusUpdate.self)
 
         MagicUiView.installActionPlugin(name: "reloadAllTimelines", plugin: SxAction_reloadAllTimelines.self)

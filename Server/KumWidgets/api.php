@@ -63,6 +63,37 @@ function mutateVariables(string $user, callable $mutator): array {
     return $vars;
 }
 
+function getWidgetUrl(string $user, string $family): string {
+    $query = '?family=' . rawurlencode($family);
+
+    if (empty($_SERVER['HTTP_HOST'])) {
+        return "{$user}.php{$query}";
+    }
+
+    $https  = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $scheme = $https ? 'https' : 'http';
+    $base   = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+
+    return "{$scheme}://{$_SERVER['HTTP_HOST']}{$base}/{$user}.php{$query}";
+}
+
+function writeWidgetXml(string $user, string $family, string $content): bool {
+    $file = getDataFile($user, $family);
+    $tmp  = $file . '.tmp.' . getmypid();
+
+    if (file_put_contents($tmp, $content, LOCK_EX) === false) {
+        return false;
+    }
+
+    if (!rename($tmp, $file)) {
+        @unlink($tmp);
+        return false;
+    }
+
+    regenerateUserFile($user);
+    return true;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $action = $_GET['action'] ?? '';
 
@@ -209,13 +240,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $user    = $input['user']    ?? '';
-    $family  = $input['family']  ?? '';
-    $content = $input['content'] ?? '';
-
-    if ($action !== 'save') {
+    if (!in_array($action, ['save', 'upload_xml'], true)) {
         echo json_encode(['success' => false, 'error' => 'Unknown action']);
         exit;
+    }
+
+    $user   = $input['user'] ?? '';
+    $family = $input['family'] ?? ($action === 'upload_xml' ? 'systemSmall' : '');
+
+    if ($action === 'upload_xml') {
+        if (array_key_exists('xml', $input)) {
+            $content = (string)$input['xml'];
+        } elseif (array_key_exists('content', $input)) {
+            $content = (string)$input['content'];
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Missing xml']);
+            exit;
+        }
+    } else {
+        $content = $input['content'] ?? '';
     }
 
     if (!in_array($user, $allowedUsers) || !in_array($family, $allowedFamilies)) {
@@ -223,11 +266,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $file = getDataFile($user, $family);
-    if (file_put_contents($file, $content) !== false) {
-        // Also regenerate the user's PHP serving file
-        regenerateUserFile($user);
-        echo json_encode(['success' => true]);
+    if (writeWidgetXml($user, $family, $content)) {
+        echo json_encode([
+            'success' => true,
+            'user'    => $user,
+            'family'  => $family,
+            'url'     => getWidgetUrl($user, $family),
+        ]);
     } else {
         echo json_encode(['success' => false, 'error' => 'Failed to write file']);
     }
@@ -260,6 +305,19 @@ function regenerateUserFile(string $user): void {
     $code .= "        exit;\n";
     $code .= "    }\n";
     $code .= "    \$_xml = file_get_contents(\$_file);\n";
+    $code .= "    \$_preview = !empty(\$_GET['mode']) && \$_GET['mode'] === 'preview';\n";
+    $code .= "    if (\$_preview) {\n";
+    $code .= "        // Remove \\\\-separated segments that contain {{...}} from attribute values\n";
+    $code .= "        \$_xml = preg_replace_callback('/(=\"[^\"]*\")/', function (\$m) {\n";
+    $code .= "            \$val = substr(\$m[1], 2, -1); // strip =\" and \"\n";
+    $code .= "            \$parts = explode('\\\\\\\\', \$val);\n";
+    $code .= "            \$filtered = array_filter(\$parts, function (\$p) {\n";
+    $code .= "                return !preg_match('/\\{\\{[^}]+\\}\\}/', \$p);\n";
+    $code .= "            });\n";
+    $code .= "            \$result = implode('\\\\\\\\', \$filtered);\n";
+    $code .= "            return '=\"' . \$result . '\"';\n";
+    $code .= "        }, \$_xml);\n";
+    $code .= "    }\n";
     $code .= "    foreach (\$_vars as \$_k => \$_v) {\n";
     $code .= "        \$_xml = str_replace('{{' . \$_k . '}}', htmlspecialchars(\$_v, ENT_XML1, 'UTF-8'), \$_xml);\n";
     $code .= "    }\n";

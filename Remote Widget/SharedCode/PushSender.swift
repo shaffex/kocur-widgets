@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MagicUiFramework
+import WidgetKit
 
 enum PushSender {
     static func send(title: String, body: String, sound: String = "default") async throws {
@@ -106,9 +107,17 @@ enum VariableUpdater {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
 
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
+        }
+        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let success = json["success"] as? Bool, !success {
+            throw NSError(
+                domain: "VariableUpdater",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: (json["error"] as? String) ?? "Unknown error"]
+            )
         }
     }
 }
@@ -147,6 +156,61 @@ struct SxAction_updateWidgetsOnAllDevices: SxActionProtocol {
                 SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "widgetUpdateError")
             }
         }
+    }
+}
+
+struct SxAction_updateKocurStatus: SxActionProtocol {
+    let node: MagicNode?
+
+    func execute(_ actionString: String) {
+        let vars = SxMagicVariables.shared
+        let status = Self.stringValue(vars.value(forKey: "kocurStatus"))
+        let emojis = Self.stringValue(vars.value(forKey: "kocurEmojis"))
+        let isNewVideo = Self.boolValue(vars.value(forKey: "kocurIsNewVideo"))
+        let user = BusinessLogic.shared.currentUser
+
+        guard !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        Task { @MainActor in
+            do {
+                try await VariableUpdater.update([
+                    "STATUS": status,
+                    "EMOJIS": emojis,
+                    "IS_NEWVIDEO": isNewVideo ? "true" : "false"
+                ], user: user)
+
+                try await StatusHistory.log(
+                    status: status,
+                    emojis: emojis,
+                    isNewVideo: isNewVideo,
+                    user: user
+                )
+
+                try await WidgetUpdater.triggerReload(data: [
+                    "user": user,
+                    "status": status
+                ])
+
+                WidgetCenter.shared.reloadAllTimelines()
+                PluginActions.shared.runAction("reloadView:viewId:previewSmallWidget")
+                vars.setValue("", forKey: "statusError")
+            } catch {
+                vars.setValue("Failed: \(error.localizedDescription)", forKey: "statusError")
+            }
+        }
+    }
+
+    private static func stringValue(_ value: Any?) -> String {
+        if let string = value as? String { return string }
+        if let bool = value as? Bool { return bool ? "true" : "false" }
+        if let number = value as? NSNumber { return number.stringValue }
+        return ""
+    }
+
+    private static func boolValue(_ value: Any?) -> Bool {
+        if let bool = value as? Bool { return bool }
+        let string = stringValue(value).lowercased()
+        return string == "true" || string == "1" || string == "yes"
     }
 }
 

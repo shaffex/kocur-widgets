@@ -36,7 +36,7 @@
         
         
         
-        <button buttonStyle="borderedProminent"  action="playSystemSound:4095\\setVariable:STATUS:$kocurStatus\\setVariable:EMOJIS:$kocurEmojis\\setVariable:IS_NEWVIDEO:$kocurIsNewVideo\\logStatusUpdate\\updateWidgetsOnAllDevices">Update Kocur Status</button>
+        <button buttonStyle="borderedProminent" action="playSystemSound:4095\\updateKocurStatus">Update Kocur Status</button>
         
         
         </section>

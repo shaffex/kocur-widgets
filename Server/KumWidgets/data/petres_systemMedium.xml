@@ -1,0 +1,60 @@
+<body>
+    <vstack alignment="leading" spacing="8" padding="10">
+        <hstack>
+            <text font="headline" fontWeight="bold">WC26 Today</text>
+            <spacer/>
+            <text font="caption2" foregroundColor="secondary">18 Jun</text>
+        </hstack>
+        <hstack spacing="10" alignment="top">
+            <vstack alignment="leading" spacing="5" frame="maxWidth:infinity">
+                <text font="caption" fontWeight="semibold" foregroundColor="secondary">GROUP A</text>
+                <hstack>
+                    <text font="caption" fontWeight="semibold">CZE</text>
+                    <spacer/>
+                    <text font="caption" fontWeight="bold">17:00</text>
+                </hstack>
+                <hstack>
+                    <text font="caption">RSA</text>
+                    <spacer/>
+                    <text font="caption">ATL</text>
+                </hstack>
+                <divider/>
+                <hstack>
+                    <text font="caption" fontWeight="semibold">MEX</text>
+                    <spacer/>
+                    <text font="caption" fontWeight="bold">02:00</text>
+                </hstack>
+                <hstack>
+                    <text font="caption">KOR</text>
+                    <spacer/>
+                    <text font="caption">GDL</text>
+                </hstack>
+            </vstack>
+            <divider/>
+            <vstack alignment="leading" spacing="5" frame="maxWidth:infinity">
+                <text font="caption" fontWeight="semibold" foregroundColor="secondary">GROUP B</text>
+                <hstack>
+                    <text font="caption" fontWeight="semibold">SUI</text>
+                    <spacer/>
+                    <text font="caption" fontWeight="bold">20:00</text>
+                </hstack>
+                <hstack>
+                    <text font="caption">BIH</text>
+                    <spacer/>
+                    <text font="caption">LA</text>
+                </hstack>
+                <divider/>
+                <hstack>
+                    <text font="caption" fontWeight="semibold">CAN</text>
+                    <spacer/>
+                    <text font="caption" fontWeight="bold">23:00</text>
+                </hstack>
+                <hstack>
+                    <text font="caption">QAT</text>
+                    <spacer/>
+                    <text font="caption">VAN</text>
+                </hstack>
+            </vstack>
+        </hstack>
+    </vstack>
+</body>
