@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F0510302FF8693100F6DADD /* MagicUi in Frameworks */ = {isa = PBXBuildFile; productRef = 2F05102F2FF8693100F6DADD /* MagicUi */; };
+		2F0510392FF86A4100F6DADD /* MagicUi in Frameworks */ = {isa = PBXBuildFile; productRef = 2F0510382FF86A4100F6DADD /* MagicUi */; };
+		2F05103C2FF86A7B00F6DADD /* MagicUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2F05103B2FF86A7B00F6DADD /* MagicUI */; };
 		2F14B70F2F7EA6DC00DE5212 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F14B6912F7EA17300DE5212 /* WidgetKit.framework */; };
 		2F14B7102F7EA6DC00DE5212 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F14B6932F7EA17300DE5212 /* SwiftUI.framework */; };
 		2F14B71B2F7EA6DE00DE5212 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2F14B7232F7EA6FD00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B7222F7EA6FD00DE5212 /* MagicWidget */; };
-		2F14B72D2F7EAB5B00DE5212 /* MagicWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 2F14B72C2F7EAB5B00DE5212 /* MagicWidget */; };
 		2FC703362F86AF64009457F7 /* meow9.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703352F86AF64009457F7 /* meow9.wav */; };
 		2FC703372F86AF64009457F7 /* meow5.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703312F86AF64009457F7 /* meow5.wav */; };
 		2FC703382F86AF64009457F7 /* meow8.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2FC703342F86AF64009457F7 /* meow8.wav */; };
@@ -108,7 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F14B72D2F7EAB5B00DE5212 /* MagicWidget in Frameworks */,
+				2F0510302FF8693100F6DADD /* MagicUi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,8 +117,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F0510392FF86A4100F6DADD /* MagicUi in Frameworks */,
 				2F14B7102F7EA6DC00DE5212 /* SwiftUI.framework in Frameworks */,
-				2F14B7232F7EA6FD00DE5212 /* MagicWidget in Frameworks */,
+				2F05103C2FF86A7B00F6DADD /* MagicUI in Frameworks */,
 				2F14B70F2F7EA6DC00DE5212 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -186,7 +188,7 @@
 			);
 			name = "Remote Widget";
 			packageProductDependencies = (
-				2F14B72C2F7EAB5B00DE5212 /* MagicWidget */,
+				2F05102F2FF8693100F6DADD /* MagicUi */,
 			);
 			productName = "Remote Widget";
 			productReference = 2F14B67D2F7EA07A00DE5212 /* Remote Widget.app */;
@@ -209,7 +211,8 @@
 			);
 			name = WidgetExtensionExtension;
 			packageProductDependencies = (
-				2F14B7222F7EA6FD00DE5212 /* MagicWidget */,
+				2F0510382FF86A4100F6DADD /* MagicUi */,
+				2F05103B2FF86A7B00F6DADD /* MagicUI */,
 			);
 			productName = WidgetExtensionExtension;
 			productReference = 2F14B70E2F7EA6DC00DE5212 /* WidgetExtensionExtension.appex */;
@@ -243,7 +246,8 @@
 			mainGroup = 2F14B6742F7EA07A00DE5212;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2F14B7212F7EA6FD00DE5212 /* XCRemoteSwiftPackageReference "magicwidget" */,
+				2F05102E2FF8693100F6DADD /* XCRemoteSwiftPackageReference "magicui-framework-beta" */,
+				2F05103A2FF86A7B00F6DADD /* XCRemoteSwiftPackageReference "magicui-v2" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2F14B67E2F7EA07A00DE5212 /* Products */;
@@ -604,9 +608,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2F14B7212F7EA6FD00DE5212 /* XCRemoteSwiftPackageReference "magicwidget" */ = {
+		2F05102E2FF8693100F6DADD /* XCRemoteSwiftPackageReference "magicui-framework-beta" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/shaffex/magicwidget.git";
+			repositoryURL = "https://gitlab.com/peter.popovec/magicui-framework-beta";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		2F05103A2FF86A7B00F6DADD /* XCRemoteSwiftPackageReference "magicui-v2" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/shaffex/magicui-v2";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -615,15 +627,20 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2F14B7222F7EA6FD00DE5212 /* MagicWidget */ = {
+		2F05102F2FF8693100F6DADD /* MagicUi */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2F14B7212F7EA6FD00DE5212 /* XCRemoteSwiftPackageReference "magicwidget" */;
-			productName = MagicWidget;
+			package = 2F05102E2FF8693100F6DADD /* XCRemoteSwiftPackageReference "magicui-framework-beta" */;
+			productName = MagicUi;
 		};
-		2F14B72C2F7EAB5B00DE5212 /* MagicWidget */ = {
+		2F0510382FF86A4100F6DADD /* MagicUi */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2F14B7212F7EA6FD00DE5212 /* XCRemoteSwiftPackageReference "magicwidget" */;
-			productName = MagicWidget;
+			package = 2F05102E2FF8693100F6DADD /* XCRemoteSwiftPackageReference "magicui-framework-beta" */;
+			productName = MagicUi;
+		};
+		2F05103B2FF86A7B00F6DADD /* MagicUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F05103A2FF86A7B00F6DADD /* XCRemoteSwiftPackageReference "magicui-v2" */;
+			productName = MagicUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

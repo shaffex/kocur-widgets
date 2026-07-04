@@ -9,12 +9,12 @@ import WidgetKit
 import SwiftUI
 import ActivityKit
 
-import MagicUiFramework
+import MagicUI
 
 struct SimpleLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: ActivityData.self) { context in
-            MagicUiWidgetView(string: context.state.xml)
+            MagicUiView(string: context.state.xml)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.center) {
