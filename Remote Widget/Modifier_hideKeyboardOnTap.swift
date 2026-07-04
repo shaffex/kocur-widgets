@@ -5,8 +5,8 @@
 //  Created by Peter Popovec on 12/04/2026.
 //
 
-import MagicUiFramework
 import SwiftUI
+import UIKit
 
 extension View {
     func hideKeyboardOnTap() -> some View {
@@ -26,13 +26,5 @@ private struct HideKeyboardOnTap: ViewModifier {
                     for: nil
                 )
             }
-    }
-}
-
-struct Modifier_hideKeyboardOnTap: SxModifierProtocol {
-    @DynamicNode var node: MagicNode
-    
-    func body(content: Content) -> some View {
-        content.hideKeyboardOnTap()
     }
 }

@@ -5,14 +5,14 @@
 //  Created by Peter Popovec on 12/04/2026.
 //
 
-import MagicUiFramework
+import MagicUI
 import SwiftUI
 
 
-struct Modifier_contentShapeRect: SxModifierProtocol {
-    @DynamicNode var node: MagicNode
+struct Modifier_contentShapeRect: MagicModifierProvider {
     
-    func body(content: Content) -> some View {
-        content.contentShape(Rectangle())
+    func apply(to view: AnyView, value: String,
+                   element: MagicElement, context: MagicContext) -> some View {
+        view.contentShape(Rectangle())
     }
 }

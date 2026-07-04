@@ -6,47 +6,17 @@
 //
 
 import SwiftUI
-import MagicUiFramework
+import MagicUI
 
 struct ContentView: View {
     init() {
-        // actions
-        MagicUiView.installActionPlugin(name: "updateVariablesToServer", plugin: SxAction_updateVariablesToServer.self)
-        
-        MagicUiView.installActionPlugin(name: "sendMessage", plugin: SxAction_sendMessage.self)
-
-        MagicUiView.installActionPlugin(name: "setVariable", plugin: SxAction_setVariable.self)
-
-        MagicUiView.installActionPlugin(name: "updateWidgetsOnAllDevices", plugin: SxAction_updateWidgetsOnAllDevices.self)
-
-        MagicUiView.installActionPlugin(name: "updateKocurStatus", plugin: SxAction_updateKocurStatus.self)
-
-        MagicUiView.installActionPlugin(name: "logStatusUpdate", plugin: SxAction_logStatusUpdate.self)
-
-        MagicUiView.installActionPlugin(name: "reloadAllTimelines", plugin: SxAction_reloadAllTimelines.self)
-        
-        // live activity
-        MagicUiView.installActionPlugin(name: "startLiveActivity", plugin: SxAction_startLiveActivity.self)
-        MagicUiView.installActionPlugin(name: "updateLiveActivity", plugin: SxAction_updateLiveActivity.self)
-        
-        
-        // modifiers
-        MagicUiView.installModifierPlugin(name: "hideKeyboardOnTap", plugin: Modifier_hideKeyboardOnTap.self)
-        MagicUiView.installModifierPlugin(name: "contentShapeRect", plugin: Modifier_contentShapeRect.self)
+        // The chat/status history rows rendered by the remaining MagicUI
+        // fragments use this modifier to make the whole row tappable.
+        ModifierRegistry.shared.register(Modifier_contentShapeRect(), for: "contentShapeRect")
     }
-    
+
     var body: some View {
-        MagicUiView(resource: "Main")
-            .onFirstAppear {
-                SxEnvironmentObject.shared.setValue("fff", forKey: "DEVICE_UUID")
-                SxMagicVariables.shared.setValue("MIW", forKey: "DEVICE_UUID")
-                //SxMagicVariables.shared.setValue("MIW", forKey: "DEVICE_UUID")
-                
-                // we can update only when view is loaded
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                    SxEnvironmentObject.shared.setValue( UIDevice.current.identifierForVendor?.uuidString ?? "N/A", forKey: "DEVICE_UUID")
-                }
-            }
+        MainView()
     }
 }
 

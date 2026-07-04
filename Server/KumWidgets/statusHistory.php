@@ -87,8 +87,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     $user       = esc($entry['user'] ?? 'petres');
     $time       = isset($entry['timestamp']) ? esc(relativeTime($entry['timestamp'])) : '';
     $fullTime   = isset($entry['timestamp']) ? esc(date('M j, Y g:i A', strtotime($entry['timestamp']))) : '';
+    $rowBackground = ($entry['user'] ?? 'petres') === 'petres' ? '77FFFF40' : '0000FF40';
 ?>
-        <vstack contentShapeRect="" onTapGesture="playSystemSound:1033\\setVariable:kocurStatus:<?= $status ?>\\setVariable:kocurEmojis:<?= $emojis ?>\\setString:selectedTab=Widgets" alignment="leading" spacing="4" padding="top:8;bottom:8" listRowBackground="js: '<?= $user ?>' == 'petres' ? '77FFFF40' : '0000FF40'">
+        <vstack contentShapeRect="" onTapGesture="playSystemSound:1033 | setValue:key:kocurStatus;value:<?= $status ?> | setValue:key:kocurEmojis;value:<?= $emojis ?> | setValue:key:selectedTab;value:Widgets" alignment="leading" spacing="4" padding="top:8;bottom:8" listRowBackground="<?= $rowBackground ?>">
             <hstack>
                 <text font="headline"><?= $emojis ?></text>
                 <spacer/>

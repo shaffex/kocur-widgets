@@ -5,8 +5,7 @@
 //  Created by Peter Popovec on 10/04/2026.
 //
 
-import SwiftUI
-import MagicUiFramework
+import Foundation
 import WidgetKit
 
 enum PushSender {
@@ -33,64 +32,19 @@ enum PushSender {
     }
 }
 
-struct SxAction_sendMessage: SxActionProtocol {
-    let node: MagicNode?
-
-    func execute(_ actionString: String) {
-        let vars = SxMagicVariables.shared
-        let msgTitle = vars.value(forKey: "msgTitle") as? String ?? ""
-        let msgBody  = vars.value(forKey: "msgBody")  as? String ?? ""
-        let msgSound = vars.value(forKey: "msgSound") as? String ?? "default"
-
-        Task { @MainActor in
-            
-            PluginActions.shared.runAction("playSystemSound:1004\\dismissView:viewId:sheetViewNewMessage")
-            
-            //return()
-            
-            do {
-                try await PushSender.send(title: msgTitle, body: msgBody, sound: msgSound)
-                PluginActions.shared.runAction("reloadView:viewId:chatView")
-            } catch {
-                SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "msgError")
-                PluginActions.shared.runAction("delay:1.0:presentAlert:alertMessageFailed")
-            }
+enum MessageSender {
+    /// Sends the push notification. Returns an error description on failure, nil on success.
+    static func send(title: String, body: String, sound: String) async -> String? {
+        do {
+            try await PushSender.send(title: title, body: body, sound: sound)
+            return nil
+        } catch {
+            return "Failed: \(error.localizedDescription)"
         }
     }
 }
 
 enum VariableUpdater {
-    static func set(key: String, value: String, user: String) async throws {
-        guard let url = URL(string: "https://magic-ui.com/KumWidgets/api.php") else {
-            throw URLError(.badURL)
-        }
-
-        let payload: [String: Any] = [
-            "action": "set_variable",
-            "user":   user,
-            "key":    key,
-            "value":  value
-        ]
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let success = json["success"] as? Bool, !success {
-            throw NSError(
-                domain: "VariableUpdater",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: (json["error"] as? String) ?? "Unknown error"]
-            )
-        }
-    }
-
     static func update(_ variables: [String: String], user: String = "petres") async throws {
         guard let url = URL(string: "https://magic-ui.com/KumWidgets/api.php") else {
             throw URLError(.badURL)
@@ -145,75 +99,6 @@ enum WidgetUpdater {
     }
 }
 
-struct SxAction_updateWidgetsOnAllDevices: SxActionProtocol {
-    let node: MagicNode?
-
-    func execute(_ actionString: String) {
-        Task { @MainActor in
-            do {
-                try await WidgetUpdater.triggerReload()
-            } catch {
-                SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "widgetUpdateError")
-            }
-        }
-    }
-}
-
-struct SxAction_updateKocurStatus: SxActionProtocol {
-    let node: MagicNode?
-
-    func execute(_ actionString: String) {
-        let vars = SxMagicVariables.shared
-        let status = Self.stringValue(vars.value(forKey: "kocurStatus"))
-        let emojis = Self.stringValue(vars.value(forKey: "kocurEmojis"))
-        let isNewVideo = Self.boolValue(vars.value(forKey: "kocurIsNewVideo"))
-        let user = BusinessLogic.shared.currentUser
-
-        guard !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-
-        Task { @MainActor in
-            do {
-                try await VariableUpdater.update([
-                    "STATUS": status,
-                    "EMOJIS": emojis,
-                    "IS_NEWVIDEO": isNewVideo ? "true" : "false"
-                ], user: user)
-
-                try await StatusHistory.log(
-                    status: status,
-                    emojis: emojis,
-                    isNewVideo: isNewVideo,
-                    user: user
-                )
-
-                try await WidgetUpdater.triggerReload(data: [
-                    "user": user,
-                    "status": status
-                ])
-
-                WidgetCenter.shared.reloadAllTimelines()
-                PluginActions.shared.runAction("reloadView:viewId:previewSmallWidget")
-                vars.setValue("", forKey: "statusError")
-            } catch {
-                vars.setValue("Failed: \(error.localizedDescription)", forKey: "statusError")
-            }
-        }
-    }
-
-    private static func stringValue(_ value: Any?) -> String {
-        if let string = value as? String { return string }
-        if let bool = value as? Bool { return bool ? "true" : "false" }
-        if let number = value as? NSNumber { return number.stringValue }
-        return ""
-    }
-
-    private static func boolValue(_ value: Any?) -> Bool {
-        if let bool = value as? Bool { return bool }
-        let string = stringValue(value).lowercased()
-        return string == "true" || string == "1" || string == "yes"
-    }
-}
-
 enum StatusHistory {
     static func log(status: String, emojis: String, isNewVideo: Bool, user: String) async throws {
         guard let url = URL(string: "https://magic-ui.com/KumWidgets/statusHistory.php") else {
@@ -239,57 +124,45 @@ enum StatusHistory {
     }
 }
 
-struct SxAction_logStatusUpdate: SxActionProtocol {
-    let node: MagicNode?
+enum KocurStatusUpdater {
+    /// Pushes a new status to the server, logs it, and asks widgets to reload.
+    /// Returns an error description on failure, nil on success (or on an empty status, a no-op).
+    static func update(status: String, emojis: String, isNewVideo: Bool) async -> String? {
+        guard !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        let user = BusinessLogic.shared.currentUser
 
-    func execute(_ actionString: String) {
-        let vars = SxMagicVariables.shared
-        let status     = vars.value(forKey: "kocurStatus")     as? String ?? ""
-        let emojis     = vars.value(forKey: "kocurEmojis")     as? String ?? ""
-        let isNewVideo = vars.value(forKey: "kocurIsNewVideo") as? String ?? "false"
+        do {
+            try await VariableUpdater.update([
+                "STATUS": status,
+                "EMOJIS": emojis,
+                "IS_NEWVIDEO": isNewVideo ? "true" : "false"
+            ], user: user)
 
-        guard !status.isEmpty else { return }
+            try await StatusHistory.log(
+                status: status,
+                emojis: emojis,
+                isNewVideo: isNewVideo,
+                user: user
+            )
 
-        Task { @MainActor in
-            do {
-                try await StatusHistory.log(
-                    status: status,
-                    emojis: emojis,
-                    isNewVideo: isNewVideo == "true" || isNewVideo == "1", user: BusinessLogic.shared.currentUser
-                )
-            } catch {
-                SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "statusError")
-            }
+            try await WidgetUpdater.triggerReload(data: [
+                "user": user,
+                "status": status
+            ])
+
+            WidgetCenter.shared.reloadAllTimelines()
+            return nil
+        } catch {
+            return "Failed: \(error.localizedDescription)"
         }
     }
-}
 
-struct SxAction_setVariable: SxActionProtocol {
-    let node: MagicNode?
-
-    func execute(_ actionString: String) {
-        // Expected format: setVariable:<KEY>:<VALUE>
-        // or read from magic variables "varKey" / "varValue"
-        let parts = actionString.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false).map(String.init)
-
-        let key: String
-        let value: String
-        if parts.count == 2 {
-            key   = parts[0]
-            value = parts[1]
-        } else {
-            return
-        }
-
-        guard !key.isEmpty else { return }
-
-        Task { @MainActor in
-            do {
-                try await VariableUpdater.set(key: key, value: value, user: BusinessLogic.shared.currentUser)
-                SxMagicVariables.shared.setValue(value, forKey: key)
-            } catch {
-                SxMagicVariables.shared.setValue("Failed: \(error.localizedDescription)", forKey: "varError")
-            }
+    static func updateAllDevices() async -> String? {
+        do {
+            try await WidgetUpdater.triggerReload()
+            return nil
+        } catch {
+            return "Failed: \(error.localizedDescription)"
         }
     }
 }

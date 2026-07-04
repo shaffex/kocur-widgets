@@ -5,7 +5,7 @@
 //  Created by Peter Popovec on 11/04/2026.
 //
 
-import MagicUiFramework
+import MagicUI
 
 struct BusinessLogic {
     static let shared = BusinessLogic()
@@ -13,7 +13,7 @@ struct BusinessLogic {
     private init() {}
     
     var currentUser: String {
-        SxMagicVariables.shared.value(forKey: "kumMode") as? String ?? "petres"
+        AppEnvironment.env.value(for: "kumMode")?.stringValue ?? "petres"
     }
     
     var widgetURL: String {

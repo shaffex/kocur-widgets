@@ -51,7 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     $time     = isset($entry['timestamp']) ? esc(relativeTime($entry['timestamp'])) : '';
     $fullTime = isset($entry['timestamp']) ? esc(date('M j, Y g:i A', strtotime($entry['timestamp']))) : '';
 ?>
-        <vstack contentShapeRect="" alignment="leading" spacing="4" padding="top:8;bottom:8" onTapGesture="playSystemSound:1033\\setString:msgTitle=<?= $title ?>\\setString:msgBody=<?= $body ?>\\setString:msgSound=<?= $sound ?>\\presentSheet:isPresented:viewNewMessage">
+        <vstack contentShapeRect="" alignment="leading" spacing="4" padding="top:8;bottom:8" onTapGesture="playSystemSound:1033 | setValue:key:msgTitle;value:<?= $title ?> | setValue:key:msgBody;value:<?= $body ?> | setValue:key:msgSound;value:<?= $sound ?> | setValue:key:viewNewMessage;type:bool;value:true">
             <hstack>
                 <text font="headline"><?= $title ?></text>
                 <spacer/>

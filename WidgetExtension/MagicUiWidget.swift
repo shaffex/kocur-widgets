@@ -70,6 +70,7 @@ struct MagicUiWidget: Widget {
         }
         .configurationDisplayName("Magic UI")
         .description("Displays Magic UI content from a configurable URL.")
+        .pushHandler(MagicUiWidgetPushHandler.self)
     }
 }
 

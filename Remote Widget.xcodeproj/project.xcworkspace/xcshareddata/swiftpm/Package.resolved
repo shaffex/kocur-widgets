@@ -1,22 +1,13 @@
 {
-  "originHash" : "f8e261f9e4dd6dc85e2ad42e30684080af0d969bcc0d61abc0b5e9fe4d921ae3",
+  "originHash" : "f0a0a32a52e3a20f05a4534322b8102c32b399f349108c83431c7c2ad49c0f86",
   "pins" : [
-    {
-      "identity" : "magicui-framework-beta",
-      "kind" : "remoteSourceControl",
-      "location" : "https://gitlab.com/peter.popovec/magicui-framework-beta",
-      "state" : {
-        "revision" : "9e06d174659f3ee6308674368e0c609c0a4cc636",
-        "version" : "1.1.0"
-      }
-    },
     {
       "identity" : "magicui-v2",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/shaffex/magicui-v2",
       "state" : {
         "branch" : "main",
-        "revision" : "35951268fab3be75cb340c6725902086dad48f2b"
+        "revision" : "75776b4009ce4a3c8a5c4d35ca448d299ee9534c"
       }
     }
   ],
