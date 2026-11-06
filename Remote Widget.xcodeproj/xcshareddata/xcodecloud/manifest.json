@@ -1,0 +1,9 @@
+{
+  "id" : "648f25e7-3acc-4fea-8179-aae8a6caf974",
+  "targets" : [
+    {
+      "id" : "dbcfd1b3-24da-4dbe-8af9-b6a96aca47ec",
+      "name" : "Remote Widget"
+    }
+  ]
+}
